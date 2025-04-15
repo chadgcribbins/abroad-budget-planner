@@ -1,0 +1,53 @@
+{
+  "name": "abroad-budget-planner",
+  "version": "1.0.0",
+  "description": "The Living Abroad Budgeting Tool is an interactive web application designed to help families relocating internationally model and plan their financial lives with confidence. Born from a specific and personal need—to support one family's move from the UK to Portugal under the Non-Habitual Resident (NHR) tax regime—this tool was created not just to solve an individual problem, but with a clear recognition of its broader relevance.",
+  "author": "Chad",
+  "private": true,
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "next lint",
+    "task:dev": "node scripts/dev.js",
+    "task:list": "node scripts/dev.js list",
+    "task:generate": "node scripts/dev.js generate",
+    "task:parse-prd": "node scripts/dev.js parse-prd"
+  },
+  "dependencies": {
+    "@anthropic-ai/sdk": "^0.39.0",
+    "boxen": "^8.0.1",
+    "chalk": "^4.1.2",
+    "commander": "^11.1.0",
+    "cli-table3": "^0.6.5",
+    "cors": "^2.8.5",
+    "dotenv": "^16.3.1",
+    "express": "^4.21.2",
+    "fastmcp": "^1.20.5",
+    "figlet": "^1.8.0",
+    "fuse.js": "^7.0.0",
+    "gradient-string": "^3.0.0",
+    "helmet": "^8.1.0",
+    "inquirer": "^12.5.0",
+    "jsonwebtoken": "^9.0.2",
+    "lru-cache": "^10.2.0",
+    "mongodb": "^6.5.0",
+    "next": "^14.1.4",
+    "openai": "^4.89.0",
+    "ora": "^8.2.0",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0"
+  },
+  "devDependencies": {
+    "@types/node": "^20.11.30",
+    "@types/react": "^18.2.67",
+    "@types/react-dom": "^18.2.22",
+    "autoprefixer": "^10.4.19",
+    "daisyui": "^4.7.3",
+    "eslint": "^8.57.0",
+    "eslint-config-next": "^14.1.4",
+    "postcss": "^8.4.38",
+    "tailwindcss": "^3.4.1",
+    "typescript": "^5.4.2"
+  }
+}

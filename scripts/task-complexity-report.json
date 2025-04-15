@@ -1,0 +1,91 @@
+{
+  "meta": {
+    "generatedAt": "2025-04-15T20:56:36.921Z",
+    "tasksAnalyzed": 10,
+    "thresholdScore": 5,
+    "projectName": "Your Project Name",
+    "usedResearch": false
+  },
+  "complexityAnalysis": [
+    {
+      "taskId": 1,
+      "taskTitle": "Set up Project Repository",
+      "complexityScore": 5,
+      "recommendedSubtasks": 5,
+      "expansionPrompt": "Break down the steps for setting up the project repository, configuring the development environment, and integrating the required tools and services.",
+      "reasoning": "This task involves several distinct steps, including creating a new repository, setting up the development environment with various tools and integrations, and configuring the tech stack. While not overly complex, it requires careful planning and execution."
+    },
+    {
+      "taskId": 2,
+      "taskTitle": "Design User Interface",
+      "complexityScore": 7,
+      "recommendedSubtasks": 6,
+      "expansionPrompt": "Outline the steps for designing the user interface screens, components, design system, and user flow based on the product requirements document (PRD), and collaborating with the development team.",
+      "reasoning": "Designing a comprehensive user interface with a design system, reusable components, and user flow requires a significant amount of work and attention to detail. Collaboration with the development team is also crucial for ensuring a smooth design-to-code integration."
+    },
+    {
+      "taskId": 3,
+      "taskTitle": "Implement User Profile and Household Setup",
+      "complexityScore": 6,
+      "recommendedSubtasks": 5,
+      "expansionPrompt": "Break down the steps for creating the user profile and household setup forms, capturing relevant data, implementing currency formatting logic, and integrating with the design system.",
+      "reasoning": "This task involves creating forms and input fields, implementing currency formatting logic, and integrating with the design system. While not overly complex, it requires careful planning and attention to detail to ensure a smooth user experience."
+    },
+    {
+      "taskId": 4,
+      "taskTitle": "Implement Income Modeling",
+      "complexityScore": 8,
+      "recommendedSubtasks": 6,
+      "expansionPrompt": "Outline the steps for creating input fields for various income sources, implementing currency exchange rate logic and FX calculations, integrating with the CurrencyAPI, and providing manual override options.",
+      "reasoning": "Implementing income modeling with various income sources, currency exchange rate logic, FX calculations, API integration, and manual override options is a complex task that requires careful planning and implementation."
+    },
+    {
+      "taskId": 5,
+      "taskTitle": "Implement Housing Module",
+      "complexityScore": 8,
+      "recommendedSubtasks": 7,
+      "expansionPrompt": "Break down the steps for creating the housing module, including input fields for rent or buy options, mortgage calculations, property costs, and the option to model a 'starter home' and later upgrade.",
+      "reasoning": "The housing module involves several complex calculations and options, such as mortgage calculations, property costs, and the ability to model different scenarios (rent vs. buy, starter home vs. upgrade). This complexity warrants a more detailed breakdown into subtasks."
+    },
+    {
+      "taskId": 6,
+      "taskTitle": "Implement Transportation Module",
+      "complexityScore": 7,
+      "recommendedSubtasks": 6,
+      "expansionPrompt": "Outline the steps for creating the transportation module, including input fields for car ownership, public transport, and ride-share costs, and implementing relevant calculations.",
+      "reasoning": "The transportation module involves various input fields and calculations for different modes of transportation, including car ownership, public transport, and ride-sharing. While not overly complex, it requires careful planning and implementation."
+    },
+    {
+      "taskId": 7,
+      "taskTitle": "Implement Lifestyle and Discretionary Costs Module",
+      "complexityScore": 6,
+      "recommendedSubtasks": 5,
+      "expansionPrompt": "Break down the steps for creating input fields for various lifestyle and discretionary costs, implementing logic for breaking down annual costs into monthly averages, and integrating with the overall budgeting calculations.",
+      "reasoning": "This module involves creating input fields for various lifestyle and discretionary costs, as well as implementing logic for breaking down annual costs into monthly averages. While not overly complex, it requires careful planning and integration with the overall budgeting calculations."
+    },
+    {
+      "taskId": 8,
+      "taskTitle": "Implement Utilities Module",
+      "complexityScore": 5,
+      "recommendedSubtasks": 4,
+      "expansionPrompt": "Outline the steps for creating input fields for various utility costs and implementing logic for calculating the monthly average utility costs based on user inputs.",
+      "reasoning": "The utilities module involves creating input fields for various utility costs and implementing logic for calculating the monthly average utility costs. This is a relatively straightforward task with a lower complexity score."
+    },
+    {
+      "taskId": 9,
+      "taskTitle": "Implement Education Module",
+      "complexityScore": 7,
+      "recommendedSubtasks": 6,
+      "expansionPrompt": "Break down the steps for creating the education module, including a toggle for public or private education, input fields for tuition and extra costs, and implementing logic for calculating monthly payment breakdowns.",
+      "reasoning": "The education module involves creating a toggle for public or private education, input fields for tuition and extra costs, and implementing logic for calculating monthly payment breakdowns. This complexity warrants a more detailed breakdown into subtasks."
+    },
+    {
+      "taskId": 10,
+      "taskTitle": "Implement Healthcare Module and Summary Dashboard",
+      "complexityScore": 9,
+      "recommendedSubtasks": 7,
+      "expansionPrompt": "Outline the steps for creating the healthcare module, including input fields for healthcare type, premiums, and out-of-pocket costs, implementing the emergency buffer calculation, and creating the summary dashboard by aggregating data from all modules and displaying relevant information.",
+      "reasoning": "This task involves creating the healthcare module with various input fields and calculations, as well as implementing the emergency buffer calculation and creating the summary dashboard by aggregating data from all modules. This is a complex task that requires careful planning and implementation, warranting a more detailed breakdown into subtasks."
+    }
+  ]
+}
