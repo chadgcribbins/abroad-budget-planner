@@ -1,0 +1,131 @@
+{
+  "meta": {
+    "generatedAt": "2025-04-15T02:42:33.594Z",
+    "tasksAnalyzed": 15,
+    "thresholdScore": 5,
+    "projectName": "Your Project Name",
+    "usedResearch": false
+  },
+  "complexityAnalysis": [
+    {
+      "taskId": 1,
+      "taskTitle": "Setup Project Repository and Base Structure",
+      "complexityScore": 4,
+      "recommendedSubtasks": 5,
+      "expansionPrompt": "Break down the Next.js project setup with TypeScript, TailwindCSS, and DaisyUI into specific implementation steps, including folder structure creation, Vercel configuration, and Git initialization.",
+      "reasoning": "This is a standard project setup task with well-documented steps. The complexity is moderate due to the need to integrate multiple technologies (Next.js, TypeScript, TailwindCSS, DaisyUI) and configure deployment, but these are well-established processes with good documentation."
+    },
+    {
+      "taskId": 2,
+      "taskTitle": "Implement User Profile & Household Setup Module",
+      "complexityScore": 7,
+      "recommendedSubtasks": 6,
+      "expansionPrompt": "Detail the specific components needed for the multi-step household setup form, including country selection, family composition inputs, and state management implementation.",
+      "reasoning": "This task involves creating a complex multi-step form with various input types and implementing state management. The dual currency display adds complexity, as does the need to handle different family member types and store this foundational data that will be used throughout the application."
+    },
+    {
+      "taskId": 3,
+      "taskTitle": "Develop Currency Exchange Integration",
+      "complexityScore": 6,
+      "recommendedSubtasks": 5,
+      "expansionPrompt": "Break down the currency exchange functionality into API integration, conversion utilities, UI components for display and override, and state management implementation.",
+      "reasoning": "This task requires external API integration, creating utility functions, implementing UI components for display and manual override, and ensuring the exchange rate is available throughout the application. The complexity comes from handling potential API failures and ensuring accurate currency conversions."
+    },
+    {
+      "taskId": 4,
+      "taskTitle": "Create Income Module",
+      "complexityScore": 7,
+      "recommendedSubtasks": 6,
+      "expansionPrompt": "Detail the specific components needed for the income module, including salary inputs, passive income entries with multiple line items, one-off inflows, and currency conversion display.",
+      "reasoning": "This module has high complexity due to the variety of income types, multiple currency handling, and the need to support variable numbers of entries for passive income and one-offs. The calculations must be accurate and clearly displayed, with proper integration to the exchange rate service."
+    },
+    {
+      "taskId": 5,
+      "taskTitle": "Implement Housing Module",
+      "complexityScore": 8,
+      "recommendedSubtasks": 7,
+      "expansionPrompt": "Break down the housing module implementation into specific components for rent vs. buy paths, mortgage calculations, property expenses, and upgrade modeling functionality.",
+      "reasoning": "This module has high complexity due to the branching logic (rent vs. buy), complex financial calculations for mortgages, and the modeling of property upgrades over time. Each path requires different inputs and calculations while maintaining dual currency display throughout."
+    },
+    {
+      "taskId": 6,
+      "taskTitle": "Develop Transportation Module",
+      "complexityScore": 6,
+      "recommendedSubtasks": 5,
+      "expansionPrompt": "Detail the components needed for the transportation module, including car ownership options, public transport inputs, and the calculations for displaying total transportation costs.",
+      "reasoning": "This module has moderate complexity with multiple toggle options (car ownership, electric/gas, purchase/lease) that affect which inputs are shown. The calculations are straightforward but need to handle different scenarios based on user selections."
+    },
+    {
+      "taskId": 7,
+      "taskTitle": "Create Lifestyle & Discretionary Costs Module",
+      "complexityScore": 6,
+      "recommendedSubtasks": 5,
+      "expansionPrompt": "Break down the lifestyle module into components for shopping inputs, one-off purchases, travel budgets, home services, and contingency planning with appropriate calculations.",
+      "reasoning": "This module requires multiple input types and calculations, including monthly breakdowns of annual inputs and percentage-based contingency planning. The variety of lifestyle categories adds to the complexity, though the calculations themselves are relatively straightforward."
+    },
+    {
+      "taskId": 8,
+      "taskTitle": "Implement Utilities Module",
+      "complexityScore": 4,
+      "recommendedSubtasks": 4,
+      "expansionPrompt": "Detail the components needed for the utilities module, including inputs for each utility type and the calculations for displaying total utility costs.",
+      "reasoning": "This is a relatively straightforward module with standard input fields for different utility types and simple summation calculations. The dual currency display adds some complexity but follows the pattern established in other modules."
+    },
+    {
+      "taskId": 9,
+      "taskTitle": "Develop Education Module",
+      "complexityScore": 6,
+      "recommendedSubtasks": 5,
+      "expansionPrompt": "Break down the education module into components for public/private selection per family member, tuition inputs, extra costs, and total education cost calculations.",
+      "reasoning": "This module has moderate complexity due to the need to handle education options for each school-age family member separately. The public/private toggle affects which inputs are shown, and the calculations need to account for annual-to-monthly conversions."
+    },
+    {
+      "taskId": 10,
+      "taskTitle": "Implement Healthcare Module",
+      "complexityScore": 6,
+      "recommendedSubtasks": 5,
+      "expansionPrompt": "Detail the components needed for the healthcare module, including healthcare type selection per family member, premium inputs, expense estimates, and total healthcare cost calculations.",
+      "reasoning": "Similar to the education module, this requires handling options for each family member separately with different inputs based on the selected healthcare type. The calculations need to account for both regular premiums and estimated out-of-pocket expenses."
+    },
+    {
+      "taskId": 11,
+      "taskTitle": "Create Emergency Buffer Module",
+      "complexityScore": 7,
+      "recommendedSubtasks": 5,
+      "expansionPrompt": "Break down the emergency buffer module into components for target months input, reserve amount input, fixed expense calculations, runway visualization, and state update mechanisms.",
+      "reasoning": "This module has higher complexity because it depends on data from multiple other modules to calculate fixed expenses. The visual runway meter adds UI complexity, and the module needs to update dynamically whenever relevant expenses or the reserve amount changes."
+    },
+    {
+      "taskId": 12,
+      "taskTitle": "Implement FX Sensitivity Module",
+      "complexityScore": 8,
+      "recommendedSubtasks": 6,
+      "expansionPrompt": "Detail the components needed for the FX sensitivity module, including exchange rate controls, movement simulation, impact calculations, and cross-module updates based on FX changes.",
+      "reasoning": "This is one of the more complex modules as it affects calculations across the entire application. It requires implementing simulation controls, calculating the impact of exchange rate changes on all income and expenses, and updating all dual-currency outputs accordingly."
+    },
+    {
+      "taskId": 13,
+      "taskTitle": "Develop Dashboard Summary Module",
+      "complexityScore": 9,
+      "recommendedSubtasks": 7,
+      "expansionPrompt": "Break down the dashboard summary module into components for income/expense totals, projections, comparisons, scenario management, and visualization elements.",
+      "reasoning": "This is a highly complex module that integrates data from all other modules to provide comprehensive summaries and projections. It requires accurate calculations for various financial metrics, implementing scenario management, and creating clear visualizations. The interdependencies with all other modules increase its complexity."
+    },
+    {
+      "taskId": 14,
+      "taskTitle": "Implement Complete User Flow and Navigation",
+      "complexityScore": 8,
+      "recommendedSubtasks": 6,
+      "expansionPrompt": "Detail the components needed for the user flow and navigation system, including breadcrumbs, progress indicators, section links, data validation, and responsive design implementation.",
+      "reasoning": "This task involves connecting all modules into a cohesive flow while ensuring data consistency and validation. The complexity comes from managing state across the entire application, implementing intuitive navigation that preserves user data, and ensuring responsive design across all components."
+    },
+    {
+      "taskId": 15,
+      "taskTitle": "Finalize MVP and Prepare for Deployment",
+      "complexityScore": 7,
+      "recommendedSubtasks": 6,
+      "expansionPrompt": "Break down the MVP finalization process into specific tasks for testing, performance optimization, error handling, documentation, deployment preparation, and analytics implementation.",
+      "reasoning": "This final task involves comprehensive testing and optimization across the entire application. The complexity comes from ensuring all components work together correctly, implementing performance optimizations, adding robust error handling, and preparing proper documentation and analytics for the production release."
+    }
+  ]
+}
