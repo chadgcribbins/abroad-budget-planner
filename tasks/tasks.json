@@ -535,7 +535,41 @@
       ],
       "priority": "medium",
       "details": "Create public/private education toggle for each child in the household. For private education, include annual tuition input and show monthly payment breakdown. Add fields for extra school costs like books, uniforms, and activities. Calculate education totals per child and household.",
-      "testStrategy": "Test that education options appear correctly based on household composition. Verify calculations for monthly payment breakdowns from annual tuition."
+      "testStrategy": "Test that education options appear correctly based on household composition. Verify calculations for monthly payment breakdowns from annual tuition.",
+      "subtasks": [
+        {
+          "id": 1,
+          "title": "Create Education Type Toggle and Basic Structure",
+          "description": "Implement the core education module structure with public/private education toggle for each child",
+          "dependencies": [],
+          "details": "Implementation steps:\n1. Create an Education component that integrates with the existing household data structure\n2. Add a public/private toggle switch for each child in the household\n3. Implement conditional rendering based on the education type selection\n4. Store education type selection in state for each child\n5. Create the basic layout structure for the education module\n6. Add validation to ensure each child has an education type selected\n\nTesting approach:\n- Verify the toggle works correctly for each child\n- Confirm the UI updates appropriately when switching between public and private\n- Test with various household compositions (different numbers of children)\n- Ensure state is properly maintained when navigating between sections\n\n<info added on 2025-04-16T21:38:01.533Z>\nI've reviewed the implementation and can provide these additional technical details:\n\nFor the Education.tsx component:\n- Use a Map structure like `Map<string, 'public' | 'private'>` for the education type state to ensure type safety\n- Implement the toggle using the existing design system's Toggle component with proper ARIA attributes\n- Add data-testid attributes (e.g., `data-testid=\"education-toggle-primary-0\"`) to facilitate testing\n\nState management improvements:\n- Structure the state object as `{[childId: string]: {educationType: 'public' | 'private', gradeLevel?: string}}` to accommodate future education details\n- Use React.useReducer instead of useState for more predictable state transitions when handling multiple children\n\nValidation implementation:\n- Add form validation using the existing validation framework\n- Create a validateEducation() function that returns error messages for any child missing an education type\n- Connect validation to the \"Continue\" button's onClick handler\n\nFor conditional rendering:\n- Implement a getEducationFormByType(type: 'public' | 'private', childData) function that returns the appropriate form components\n- Use React.memo to prevent unnecessary re-renders when toggling between children\n</info added on 2025-04-16T21:38:01.533Z>",
+          "status": "in-progress",
+          "parentTaskId": 13
+        },
+        {
+          "id": 2,
+          "title": "Implement Private Education Cost Inputs",
+          "description": "Add tuition and additional education cost input fields for children with private education",
+          "dependencies": [
+            1
+          ],
+          "details": "Implementation steps:\n1. Create input fields for annual tuition costs that appear only when private education is selected\n2. Add input fields for additional education expenses (books, uniforms, activities, etc.)\n3. Implement proper number formatting and validation for all cost inputs\n4. Create helper functions to convert annual costs to monthly amounts\n5. Store all education cost data in the application state\n6. Ensure inputs have appropriate labels and help text\n\nTesting approach:\n- Test input validation for all fields (negative numbers, non-numeric input, etc.)\n- Verify conditional rendering works correctly based on education type\n- Test data persistence when switching between children or sections\n- Confirm proper number formatting for currency inputs",
+          "status": "pending",
+          "parentTaskId": 13
+        },
+        {
+          "id": 3,
+          "title": "Calculate and Display Education Cost Summaries",
+          "description": "Implement calculations for per-child and household education totals with monthly breakdown",
+          "dependencies": [
+            1,
+            2
+          ],
+          "details": "Implementation steps:\n1. Create functions to calculate total education costs per child (tuition + additional costs)\n2. Implement monthly payment breakdown calculations for each child\n3. Add a summary section showing education costs per child\n4. Calculate and display total household education expenses\n5. Integrate education totals with the overall household budget calculations\n6. Add visual elements (charts or tables) to display the education cost breakdown\n\nTesting approach:\n- Verify calculations are correct for various input scenarios\n- Test with multiple children having different education types\n- Confirm monthly breakdowns are calculated correctly\n- Check that household totals accurately reflect the sum of all children's education costs\n- Test integration with the overall budget summary",
+          "status": "pending",
+          "parentTaskId": 13
+        }
+      ]
     },
     {
       "id": 14,

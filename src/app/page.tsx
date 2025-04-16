@@ -11,6 +11,7 @@ import TransportModule from '@/components/Transport/TransportModule';
 import { TransportProvider } from '@/context/TransportContext';
 import { LifestyleModule } from '@/components/Lifestyle/LifestyleModule';
 import Utilities from '@/components/Utilities';
+import Education from '@/components/Education';
 
 // Define types for household state
 const ageGroups = [
@@ -18,6 +19,10 @@ const ageGroups = [
 ] as const;
 type AgeGroup = typeof ageGroups[number];
 type HouseholdComposition = { [K in AgeGroup]: number };
+
+// Define types for Education state
+type EducationChoice = 'public' | 'private';
+type EducationState = { [childKey: string]: EducationChoice };
 
 export default function Home() {
   const [originCountry, setOriginCountry] = useState<string | null>(null);
@@ -68,6 +73,9 @@ export default function Home() {
 
   const [internet, setInternet] = useState<number | ''>(50);
   const [mobile, setMobile] = useState<number | ''>(30);
+
+  // Add state for Education Choices
+  const [educationChoices, setEducationChoices] = useState<EducationState>({});
 
   // TODO: Add state for other expense modules (Transport, Lifestyle, etc.)
 
@@ -134,6 +142,11 @@ export default function Home() {
       default:
         console.warn(`Unhandled utilities key: ${key}`);
     }
+  };
+
+  // Handler for Education state changes
+  const handleEducationChange = (childKey: string, choice: EducationChoice) => {
+    setEducationChoices(prev => ({ ...prev, [childKey]: choice }));
   };
 
   const handleDestinationChange = (countryCode: string | null) => {
@@ -215,6 +228,13 @@ export default function Home() {
           internet={internet}
           mobile={mobile}
           onUtilitiesChange={handleUtilitiesChange}
+        />
+
+        {/* Render Education Module */}
+        <Education
+          household={household}
+          educationChoices={educationChoices}
+          onEducationChange={handleEducationChange}
         />
 
         <TransportModule />
