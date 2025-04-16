@@ -1,7 +1,7 @@
 {
   "meta": {
-    "generatedAt": "2025-04-15T20:56:36.921Z",
-    "tasksAnalyzed": 10,
+    "generatedAt": "2025-04-16T00:47:37.734Z",
+    "tasksAnalyzed": 30,
     "thresholdScore": 5,
     "projectName": "Your Project Name",
     "usedResearch": false
@@ -9,83 +9,243 @@
   "complexityAnalysis": [
     {
       "taskId": 1,
-      "taskTitle": "Set up Project Repository",
-      "complexityScore": 5,
-      "recommendedSubtasks": 5,
-      "expansionPrompt": "Break down the steps for setting up the project repository, configuring the development environment, and integrating the required tools and services.",
-      "reasoning": "This task involves several distinct steps, including creating a new repository, setting up the development environment with various tools and integrations, and configuring the tech stack. While not overly complex, it requires careful planning and execution."
+      "taskTitle": "Setup Project Repository",
+      "complexityScore": 3,
+      "recommendedSubtasks": 4,
+      "expansionPrompt": "Break down the process of setting up a Next.js project with TypeScript, TailwindCSS, and DaisyUI into specific technical steps, including initialization, configuration, and version control setup.",
+      "reasoning": "This is a standard project setup task with well-defined steps. The complexity is relatively low as it involves following established patterns for Next.js initialization with common libraries."
     },
     {
       "taskId": 2,
-      "taskTitle": "Design User Interface",
-      "complexityScore": 7,
-      "recommendedSubtasks": 6,
-      "expansionPrompt": "Outline the steps for designing the user interface screens, components, design system, and user flow based on the product requirements document (PRD), and collaborating with the development team.",
-      "reasoning": "Designing a comprehensive user interface with a design system, reusable components, and user flow requires a significant amount of work and attention to detail. Collaboration with the development team is also crucial for ensuring a smooth design-to-code integration."
+      "taskTitle": "Create Basic Project Structure",
+      "complexityScore": 4,
+      "recommendedSubtasks": 5,
+      "expansionPrompt": "Detail the specific folders, files, and configurations needed to establish a maintainable Next.js project structure, including component organization, page routing, and global styling setup.",
+      "reasoning": "This task requires planning the architecture of the application. While not technically complex, it requires careful consideration of the project's organization to ensure scalability and maintainability."
     },
     {
       "taskId": 3,
-      "taskTitle": "Implement User Profile and Household Setup",
+      "taskTitle": "Implement Currency API Integration",
       "complexityScore": 6,
       "recommendedSubtasks": 5,
-      "expansionPrompt": "Break down the steps for creating the user profile and household setup forms, capturing relevant data, implementing currency formatting logic, and integrating with the design system.",
-      "reasoning": "This task involves creating forms and input fields, implementing currency formatting logic, and integrating with the design system. While not overly complex, it requires careful planning and attention to detail to ensure a smooth user experience."
+      "expansionPrompt": "Break down the implementation of a currency exchange API integration, including authentication, data fetching, caching strategies, error handling, and creating a context provider for application-wide access.",
+      "reasoning": "This task involves external API integration with caching and error handling. It requires creating a robust system that can handle API failures and provide consistent currency data throughout the application."
     },
     {
       "taskId": 4,
-      "taskTitle": "Implement Income Modeling",
-      "complexityScore": 8,
+      "taskTitle": "Design Data Models",
+      "complexityScore": 7,
       "recommendedSubtasks": 6,
-      "expansionPrompt": "Outline the steps for creating input fields for various income sources, implementing currency exchange rate logic and FX calculations, integrating with the CurrencyAPI, and providing manual override options.",
-      "reasoning": "Implementing income modeling with various income sources, currency exchange rate logic, FX calculations, API integration, and manual override options is a complex task that requires careful planning and implementation."
+      "expansionPrompt": "Detail the process of creating comprehensive TypeScript interfaces for all financial data models, including relationships between models, validation rules, and utility functions for data transformation.",
+      "reasoning": "This task involves designing the core data structures that will be used throughout the application. The complexity comes from ensuring the models accurately represent all the financial concepts while maintaining type safety and supporting calculations."
     },
     {
       "taskId": 5,
-      "taskTitle": "Implement Housing Module",
-      "complexityScore": 8,
-      "recommendedSubtasks": 7,
-      "expansionPrompt": "Break down the steps for creating the housing module, including input fields for rent or buy options, mortgage calculations, property costs, and the option to model a 'starter home' and later upgrade.",
-      "reasoning": "The housing module involves several complex calculations and options, such as mortgage calculations, property costs, and the ability to model different scenarios (rent vs. buy, starter home vs. upgrade). This complexity warrants a more detailed breakdown into subtasks."
+      "taskTitle": "Create Country Selection Component",
+      "complexityScore": 4,
+      "recommendedSubtasks": 4,
+      "expansionPrompt": "Break down the development of a country selection component, including UI design, data management, state handling, and preparing for future extensibility beyond the initial UK to Portugal path.",
+      "reasoning": "This is a relatively straightforward UI component with dropdown functionality. The complexity is moderate due to the need to design for future extensibility while focusing on the MVP path."
     },
     {
       "taskId": 6,
-      "taskTitle": "Implement Transportation Module",
-      "complexityScore": 7,
-      "recommendedSubtasks": 6,
-      "expansionPrompt": "Outline the steps for creating the transportation module, including input fields for car ownership, public transport, and ride-share costs, and implementing relevant calculations.",
-      "reasoning": "The transportation module involves various input fields and calculations for different modes of transportation, including car ownership, public transport, and ride-sharing. While not overly complex, it requires careful planning and implementation."
+      "taskTitle": "Implement Household Setup Component",
+      "complexityScore": 5,
+      "recommendedSubtasks": 5,
+      "expansionPrompt": "Detail the steps to create a household composition form, including UI elements for different age groups, validation logic, state management, and integration with the overall application state.",
+      "reasoning": "This component requires multiple input types and validation logic. The complexity comes from handling different household compositions and ensuring the data is properly stored for use in subsequent calculations."
     },
     {
       "taskId": 7,
-      "taskTitle": "Implement Lifestyle and Discretionary Costs Module",
-      "complexityScore": 6,
-      "recommendedSubtasks": 5,
-      "expansionPrompt": "Break down the steps for creating input fields for various lifestyle and discretionary costs, implementing logic for breaking down annual costs into monthly averages, and integrating with the overall budgeting calculations.",
-      "reasoning": "This module involves creating input fields for various lifestyle and discretionary costs, as well as implementing logic for breaking down annual costs into monthly averages. While not overly complex, it requires careful planning and integration with the overall budgeting calculations."
+      "taskTitle": "Develop Residency Regime Selector",
+      "complexityScore": 4,
+      "recommendedSubtasks": 4,
+      "expansionPrompt": "Break down the implementation of a residency regime selector component, including UI elements, explanatory content, state management, and integration with tax calculation logic.",
+      "reasoning": "This is a relatively simple UI component, but it needs to connect with complex tax calculation logic. The main complexity is in ensuring the selection properly influences downstream tax calculations."
     },
     {
       "taskId": 8,
-      "taskTitle": "Implement Utilities Module",
-      "complexityScore": 5,
-      "recommendedSubtasks": 4,
-      "expansionPrompt": "Outline the steps for creating input fields for various utility costs and implementing logic for calculating the monthly average utility costs based on user inputs.",
-      "reasoning": "The utilities module involves creating input fields for various utility costs and implementing logic for calculating the monthly average utility costs. This is a relatively straightforward task with a lower complexity score."
+      "taskTitle": "Build Income Input Module",
+      "complexityScore": 8,
+      "recommendedSubtasks": 6,
+      "expansionPrompt": "Detail the development of a comprehensive income input module, including salary inputs, passive income management with add/remove functionality, one-off inflows, currency conversion display, and state management.",
+      "reasoning": "This is a complex form with multiple dynamic sections, currency conversions, and different income types. It requires sophisticated state management and form handling to accommodate all the specified functionality."
     },
     {
       "taskId": 9,
-      "taskTitle": "Implement Education Module",
+      "taskTitle": "Implement Housing Module",
       "complexityScore": 7,
       "recommendedSubtasks": 6,
-      "expansionPrompt": "Break down the steps for creating the education module, including a toggle for public or private education, input fields for tuition and extra costs, and implementing logic for calculating monthly payment breakdowns.",
-      "reasoning": "The education module involves creating a toggle for public or private education, input fields for tuition and extra costs, and implementing logic for calculating monthly payment breakdowns. This complexity warrants a more detailed breakdown into subtasks."
+      "expansionPrompt": "Break down the creation of a housing module with rent/buy options, including mortgage calculations, property expense inputs, future housing modeling, and integration with the overall financial model.",
+      "reasoning": "This module contains complex financial calculations for mortgages and requires conditional rendering based on user choices. The complexity comes from implementing the financial logic correctly and creating an intuitive UI."
     },
     {
       "taskId": 10,
-      "taskTitle": "Implement Healthcare Module and Summary Dashboard",
+      "taskTitle": "Develop Transportation Module",
+      "complexityScore": 6,
+      "recommendedSubtasks": 5,
+      "expansionPrompt": "Detail the implementation of a transportation cost module, including car ownership options, public transport inputs, conditional form elements based on user selections, and integration with the overall budget calculation.",
+      "reasoning": "This module has multiple conditional sections based on user choices (car ownership, type, purchase/lease). The complexity is in managing these conditions and ensuring all relevant inputs are captured for budget calculations."
+    },
+    {
+      "taskId": 11,
+      "taskTitle": "Create Lifestyle & Discretionary Costs Module",
+      "complexityScore": 6,
+      "recommendedSubtasks": 5,
+      "expansionPrompt": "Break down the development of a lifestyle spending module, including regular expenses, dynamic add/remove functionality for one-off purchases, home services inputs, and contingency calculations.",
+      "reasoning": "This module requires dynamic form elements for adding/removing one-off purchases and various lifestyle categories. The complexity is in managing this dynamic state and calculating contingencies based on other values."
+    },
+    {
+      "taskId": 12,
+      "taskTitle": "Build Utilities Module",
+      "complexityScore": 4,
+      "recommendedSubtasks": 4,
+      "expansionPrompt": "Detail the steps to create a utilities cost input module, including individual utility inputs, monthly averaging calculations, seasonal variation options, and integration with the overall budget.",
+      "reasoning": "This is a relatively straightforward form module with standard inputs for utility costs. The main complexity is in handling potential seasonal variations and ensuring proper integration with the overall budget calculations."
+    },
+    {
+      "taskId": 13,
+      "taskTitle": "Implement Education Module",
+      "complexityScore": 6,
+      "recommendedSubtasks": 5,
+      "expansionPrompt": "Break down the implementation of an education cost module, including per-child education options, public/private toggles, tuition and additional cost inputs, and total calculations that integrate with household composition data.",
+      "reasoning": "This module depends on household composition data and requires per-child education options. The complexity comes from this dependency and the need to calculate education totals per child and for the entire household."
+    },
+    {
+      "taskId": 14,
+      "taskTitle": "Develop Healthcare Module",
+      "complexityScore": 6,
+      "recommendedSubtasks": 5,
+      "expansionPrompt": "Detail the creation of a healthcare module with coverage type selection for each household member, premium inputs, out-of-pocket expense estimation, recurring medical cost tracking, and integration with household data.",
+      "reasoning": "Similar to the education module, this depends on household composition and requires per-member healthcare options. The complexity is in managing these dependencies and calculating healthcare costs across different coverage types."
+    },
+    {
+      "taskId": 15,
+      "taskTitle": "Build Emergency Buffer Calculator",
+      "complexityScore": 7,
+      "recommendedSubtasks": 5,
+      "expansionPrompt": "Break down the implementation of an emergency savings calculator, including fixed expense aggregation from other modules, runway visualization, recommendation generation, and interactive user inputs.",
+      "reasoning": "This module depends on data from multiple other modules to calculate fixed expenses. The complexity is in aggregating this data correctly and creating meaningful visualizations and recommendations based on financial best practices."
+    },
+    {
+      "taskId": 16,
+      "taskTitle": "Implement FX Sensitivity Module",
+      "complexityScore": 8,
+      "recommendedSubtasks": 6,
+      "expansionPrompt": "Detail the development of a foreign exchange sensitivity analysis tool, including exchange rate override functionality, simulation sliders, impact visualizations, and dual-currency output integration throughout the application.",
+      "reasoning": "This is a complex module that requires sophisticated financial calculations and visualizations. It needs to show how exchange rate changes impact the entire budget, which involves recalculating many values based on FX changes."
+    },
+    {
+      "taskId": 17,
+      "taskTitle": "Develop Dashboard Summary View",
       "complexityScore": 9,
       "recommendedSubtasks": 7,
-      "expansionPrompt": "Outline the steps for creating the healthcare module, including input fields for healthcare type, premiums, and out-of-pocket costs, implementing the emergency buffer calculation, and creating the summary dashboard by aggregating data from all modules and displaying relevant information.",
-      "reasoning": "This task involves creating the healthcare module with various input fields and calculations, as well as implementing the emergency buffer calculation and creating the summary dashboard by aggregating data from all modules. This is a complex task that requires careful planning and implementation, warranting a more detailed breakdown into subtasks."
+      "expansionPrompt": "Break down the creation of a comprehensive financial dashboard, including summary metrics, disposable income projections, visualizations for key comparisons, scenario management UI, and data aggregation from all other modules.",
+      "reasoning": "This is one of the most complex tasks as it aggregates data from all other modules to create meaningful summaries and visualizations. It requires sophisticated data processing and visualization components to present financial insights effectively."
+    },
+    {
+      "taskId": 18,
+      "taskTitle": "Implement Portugal NHR Tax Logic",
+      "complexityScore": 8,
+      "recommendedSubtasks": 6,
+      "expansionPrompt": "Detail the implementation of Portugal's Non-Habitual Resident tax calculation logic, including handling different income types, gross-to-net calculations, integration with income data, and explanatory content for users.",
+      "reasoning": "This involves complex tax calculations specific to Portugal's NHR program. The complexity comes from implementing accurate tax logic for different income types and creating clear explanations of the tax implications."
+    },
+    {
+      "taskId": 19,
+      "taskTitle": "Create User Flow Navigation",
+      "complexityScore": 7,
+      "recommendedSubtasks": 6,
+      "expansionPrompt": "Break down the implementation of a multi-step form navigation system, including progress tracking, validation between steps, state persistence, quick navigation options, and responsive design considerations.",
+      "reasoning": "This task requires coordinating the entire user journey through multiple complex forms. The complexity is in managing state across steps, implementing validation, and creating an intuitive navigation experience."
+    },
+    {
+      "taskId": 20,
+      "taskTitle": "Implement Scenario Save Functionality",
+      "complexityScore": 6,
+      "recommendedSubtasks": 5,
+      "expansionPrompt": "Detail the development of scenario saving functionality, including local storage implementation, UI for scenario management, export capabilities, and state serialization/deserialization.",
+      "reasoning": "This task involves persisting complex application state to local storage and providing UI to manage saved scenarios. The complexity is in ensuring all relevant data is properly serialized and can be restored correctly."
+    },
+    {
+      "taskId": 21,
+      "taskTitle": "Develop Responsive Design",
+      "complexityScore": 7,
+      "recommendedSubtasks": 5,
+      "expansionPrompt": "Break down the process of implementing responsive design across the application, including mobile-specific component variants, touch optimization, responsive layout strategies, and testing across device sizes.",
+      "reasoning": "Making a complex financial application fully responsive is challenging. The complexity comes from adapting numerous complex forms and visualizations to work well on smaller screens while maintaining usability."
+    },
+    {
+      "taskId": 22,
+      "taskTitle": "Implement Form Validation",
+      "complexityScore": 7,
+      "recommendedSubtasks": 5,
+      "expansionPrompt": "Detail the implementation of comprehensive form validation throughout the application, including numeric input validation, currency formatting, real-time feedback, and error message design.",
+      "reasoning": "This task requires implementing validation across numerous complex forms with different input types. The complexity is in creating consistent, user-friendly validation that works across all the financial input forms."
+    },
+    {
+      "taskId": 23,
+      "taskTitle": "Create Help Text and Tooltips",
+      "complexityScore": 5,
+      "recommendedSubtasks": 4,
+      "expansionPrompt": "Break down the process of adding contextual help throughout the application, including tooltip component design, help text content creation, placement strategy, and integration with complex financial concepts.",
+      "reasoning": "This task involves creating clear explanations for complex financial concepts. While technically straightforward, it requires careful consideration of content and placement to be truly helpful without overwhelming users."
+    },
+    {
+      "taskId": 24,
+      "taskTitle": "Implement Error Handling",
+      "complexityScore": 6,
+      "recommendedSubtasks": 5,
+      "expansionPrompt": "Detail the implementation of comprehensive error handling, including React error boundaries, API error management, fallback UI components, and logging/monitoring setup.",
+      "reasoning": "Implementing robust error handling across a complex application requires careful planning. The complexity is in anticipating various failure modes and creating appropriate recovery mechanisms and user feedback."
+    },
+    {
+      "taskId": 25,
+      "taskTitle": "Optimize Performance",
+      "complexityScore": 7,
+      "recommendedSubtasks": 5,
+      "expansionPrompt": "Break down the process of optimizing application performance, including memoization strategies, component rendering optimization, async operation management, and performance profiling/testing.",
+      "reasoning": "Performance optimization in a data-heavy financial application is challenging. It requires identifying bottlenecks and implementing various optimization techniques while maintaining correctness of calculations."
+    },
+    {
+      "taskId": 26,
+      "taskTitle": "Create Clone Scenario Functionality",
+      "complexityScore": 5,
+      "recommendedSubtasks": 4,
+      "expansionPrompt": "Detail the implementation of scenario cloning functionality, including deep copying of complex state, UI for clone creation and naming, state management updates, and visual differentiation between scenarios.",
+      "reasoning": "This builds on the scenario save functionality but requires careful handling of deep state copying to ensure cloned scenarios are truly independent. The complexity is moderate as it extends existing functionality."
+    },
+    {
+      "taskId": 27,
+      "taskTitle": "Implement Vercel Deployment",
+      "complexityScore": 3,
+      "recommendedSubtasks": 4,
+      "expansionPrompt": "Break down the process of setting up Vercel deployment, including environment configuration, API key management, build optimization, and CI/CD pipeline setup.",
+      "reasoning": "Vercel deployment is relatively straightforward, especially for Next.js applications. The main considerations are environment variables for API keys and ensuring proper build configurations."
+    },
+    {
+      "taskId": 28,
+      "taskTitle": "Add Print and Export Functionality",
+      "complexityScore": 5,
+      "recommendedSubtasks": 4,
+      "expansionPrompt": "Detail the implementation of print and export functionality, including print-friendly CSS, PDF generation, CSV data export, and ensuring consistent formatting across export methods.",
+      "reasoning": "This task involves creating well-formatted exports of complex financial data. The challenge is in ensuring the exports are comprehensive and well-formatted across different output formats."
+    },
+    {
+      "taskId": 29,
+      "taskTitle": "Create User Documentation",
+      "complexityScore": 4,
+      "recommendedSubtasks": 4,
+      "expansionPrompt": "Break down the process of creating comprehensive user documentation, including user guide structure, feature documentation, example scenarios, and FAQ development.",
+      "reasoning": "Creating clear documentation for a complex financial application requires good organization and clear explanations. The technical implementation is straightforward, but creating effective content requires careful consideration."
+    },
+    {
+      "taskId": 30,
+      "taskTitle": "Implement Analytics",
+      "complexityScore": 5,
+      "recommendedSubtasks": 4,
+      "expansionPrompt": "Detail the implementation of application analytics, including event tracking setup, privacy-compliant data collection, analytics dashboard creation, and identifying key user actions to monitor.",
+      "reasoning": "Implementing analytics involves integrating with third-party services and identifying meaningful events to track. The complexity is moderate, with considerations for privacy compliance and ensuring valuable data collection."
     }
   ]
 }

@@ -1,0 +1,93 @@
+'use client';
+
+import React from 'react';
+
+export default function Home() {
+  return (
+    <>
+      {/* Hero Section */}
+      <section className="hero min-h-[70vh] bg-base-200 rounded-lg mb-12">
+        <div className="hero-content text-center">
+          <div className="max-w-md">
+            <h1 className="text-5xl font-bold">Abroad Budget Planner</h1>
+            <p className="py-6">Plan your budget for living abroad with ease. Compare costs of living, track expenses, and make informed decisions for your international adventure.</p>
+            <div className="flex gap-4 justify-center">
+              <a href="/destinations" className="btn btn-primary">Get Started</a>
+              <a href="/budget" className="btn btn-outline">Create Budget</a>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Features Section */}
+      <section className="mb-12">
+        <h2 className="text-3xl font-bold text-center mb-8">Plan Your Adventure</h2>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          <div className="card bg-base-100 shadow-xl">
+            <div className="card-body">
+              <h3 className="card-title">Compare Destinations</h3>
+              <p>Compare living costs across multiple destinations to find the perfect place that matches your budget.</p>
+              <div className="card-actions justify-end mt-4">
+                <a href="/compare" className="btn btn-sm btn-primary">Compare Now</a>
+              </div>
+            </div>
+          </div>
+          <div className="card bg-base-100 shadow-xl">
+            <div className="card-body">
+              <h3 className="card-title">Budget Planning</h3>
+              <p>Create detailed budgets for accommodation, food, transportation, and entertainment for any destination.</p>
+              <div className="card-actions justify-end mt-4">
+                <a href="/budget" className="btn btn-sm btn-primary">Plan Budget</a>
+              </div>
+            </div>
+          </div>
+          <div className="card bg-base-100 shadow-xl">
+            <div className="card-body">
+              <h3 className="card-title">Expense Tracking</h3>
+              <p>Track your actual expenses against your planned budget to stay financially on track while abroad.</p>
+              <div className="card-actions justify-end mt-4">
+                <a href="/expenses" className="btn btn-sm btn-primary">Track Expenses</a>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Popular Destinations */}
+      <section className="mb-12">
+        <h2 className="text-3xl font-bold text-center mb-8">Popular Destinations</h2>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {['Thailand', 'Portugal', 'Mexico'].map((country) => (
+            <div key={country} className="card bg-base-100 shadow-xl image-full">
+              <figure><div className="bg-gray-300 w-full h-48"></div></figure>
+              <div className="card-body">
+                <h3 className="card-title">{country}</h3>
+                <p>Explore cost of living details for {country}.</p>
+                <div className="card-actions justify-end">
+                  <a href={`/destinations/${country.toLowerCase()}`} className="btn btn-primary">View Details</a>
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+        <div className="text-center mt-8">
+          <a href="/destinations" className="btn btn-outline">View All Destinations</a>
+        </div>
+      </section>
+
+      {/* Newsletter Signup */}
+      <section className="card bg-primary text-primary-content p-8 rounded-lg">
+        <div className="flex flex-col md:flex-row items-center justify-between">
+          <div className="mb-4 md:mb-0">
+            <h3 className="text-2xl font-bold">Stay Updated</h3>
+            <p>Get the latest tips for living abroad and budget planning.</p>
+          </div>
+          <div className="join">
+            <input className="input join-item text-base-content" placeholder="Email"/>
+            <button className="btn join-item">Subscribe</button>
+          </div>
+        </div>
+      </section>
+    </>
+  );
+} 

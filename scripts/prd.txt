@@ -1,0 +1,105 @@
+# Living Abroad Budgeting Tool PRD
+
+## Overview
+The Living Abroad Budgeting Tool is an interactive web application designed to help families relocating internationally model and plan their financial lives with confidence. Initially focused on supporting moves from the UK to Portugal under the Non-Habitual Resident (NHR) tax regime, the tool aims to provide comprehensive financial planning support for international relocations.
+
+## Core Features
+
+### 1. User Authentication & Profile Management
+- Secure user registration and login system
+- Profile creation with family composition details
+- Save and manage multiple budget scenarios
+- Data privacy and GDPR compliance
+
+### 2. Location-Based Configuration
+- Country pair selection (source and destination)
+- Local tax regime information (focusing initially on UK -> Portugal NHR)
+- Cost of living data for both locations
+- Currency conversion handling
+
+### 3. Income Planning
+- Multiple income source management
+- Tax calculation based on selected regimes
+- Currency denomination options
+- Income timing and frequency settings
+
+### 4. Expense Modeling
+- Categorized expense tracking
+- Cost of living adjustments
+- Housing costs (rent/mortgage)
+- Utilities and regular bills
+- Education expenses
+- Healthcare costs
+- Transportation
+- Entertainment and leisure
+- Emergency fund planning
+
+### 5. Interactive Budget Dashboard
+- Visual budget breakdown
+- Income vs. expenses comparison
+- Savings projections
+- Risk analysis
+- Monthly cash flow visualization
+
+### 6. Report Generation
+- Detailed PDF reports
+- Comparative analysis
+- Tax implications summary
+- Savings recommendations
+
+## Technical Requirements
+
+### Frontend
+- Next.js for the web application
+- React for component architecture
+- Tailwind CSS with DaisyUI for styling
+- TypeScript for type safety
+- Responsive design for all devices
+
+### Backend
+- MongoDB for data storage
+- Express.js API server
+- JWT for authentication
+- Secure environment variable handling
+
+### Integration Features
+- Figma integration for design system
+- Whisper API for potential voice input features
+- Visual Copilot for component mapping
+- Design token synchronization
+
+### Security
+- HTTPS encryption
+- Secure password handling
+- Data encryption at rest
+- Regular security audits
+
+## User Experience
+- Intuitive navigation
+- Step-by-step budget creation
+- Real-time calculations
+- Mobile-responsive design
+- Offline capability for basic features
+- Multi-language support (initially English)
+
+## Performance Requirements
+- Page load times under 2 seconds
+- Real-time calculation updates
+- Smooth animations and transitions
+- Efficient data caching
+- Optimized API calls
+
+## Deployment
+- Continuous Integration/Deployment
+- Automated testing
+- Error monitoring and logging
+- Regular backups
+- Scalable infrastructure
+
+## Future Considerations
+- Additional country pairs
+- More tax regime support
+- Mobile application
+- Financial advisor integration
+- Community features
+- API access for partners 
