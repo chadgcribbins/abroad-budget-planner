@@ -1,6 +1,6 @@
 'use client';
 
-import React from 'react';
+import React, { useMemo } from 'react';
 import { formatNumberInput, parseFormattedNumber } from '@/utils/transformations/financial.transformations';
 
 // Define types consistent with page.tsx
@@ -44,6 +44,27 @@ const Education: React.FC<EducationProps> = ({
     }
   };
 
+  // Calculate costs - using useMemo for potential optimization
+  const educationCosts = useMemo(() => {
+    let totalAnnualCost = 0;
+    const childCosts: { [key: string]: { annual: number, monthly: number } } = {};
+
+    Object.entries(educationState).forEach(([childKey, details]) => {
+      if (details.choice === 'private') {
+        const annualTuition = Number(details.annualTuition || 0);
+        const extraCosts = Number(details.extraCosts || 0);
+        const childAnnual = annualTuition + extraCosts;
+        const childMonthly = childAnnual / 12;
+        
+        childCosts[childKey] = { annual: childAnnual, monthly: childMonthly };
+        totalAnnualCost += childAnnual;
+      }
+    });
+
+    const totalMonthlyCost = totalAnnualCost / 12;
+    return { childCosts, totalAnnualCost, totalMonthlyCost };
+  }, [educationState]);
+
   // Helper to generate child elements
   const renderChildInputs = () => {
     const elements: JSX.Element[] = [];
@@ -53,6 +74,7 @@ const Education: React.FC<EducationProps> = ({
         const childKey = `${ageGroup.toLowerCase()}-${i}`;
         const currentDetails = educationState[childKey] || { choice: 'public' }; // Default to public
         const currentChoice = currentDetails.choice;
+        const costs = educationCosts.childCosts[childKey];
 
         elements.push(
           <div key={childKey} className="mb-4 p-3 border rounded-md bg-base-200/30">
@@ -107,6 +129,13 @@ const Education: React.FC<EducationProps> = ({
                     inputMode="decimal"
                   />
                 </div>
+
+                {/* Display Per-Child Monthly Cost */}
+                {costs && (
+                  <div className="mt-2 text-sm text-right font-medium">
+                    Monthly Cost: {currencySymbol}{costs.monthly.toFixed(2)}
+                  </div>
+                )}
               </div>
             )}
           </div>
@@ -132,7 +161,19 @@ const Education: React.FC<EducationProps> = ({
           </div>
         )}
 
-        {/* TODO: Calculate and display monthly/annual totals */}
+        {/* Display Household Totals */}
+        {childInputs.length > 0 && (
+          <div className="mt-4 pt-4 border-t border-base-300 text-right">
+            <p className="font-semibold">
+              Total Monthly Education Cost: {currencySymbol}{educationCosts.totalMonthlyCost.toFixed(2)}
+            </p>
+            <p className="text-sm text-base-content/80">
+              (Total Annual: {currencySymbol}{educationCosts.totalAnnualCost.toFixed(2)})
+            </p>
+          </div>
+        )}
+
+        {/* TODO: Integrate totals with overall budget summary */}
       </div>
     </div>
   );
