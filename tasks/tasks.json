@@ -601,7 +601,7 @@
             1
           ],
           "details": "Implementation details:\n1. Create a new component called 'OutOfPocketExpenseEstimator'\n2. Implement separate numeric input fields for:\n   - GP visit costs (per visit and estimated annual frequency)\n   - Dental expenses (routine and special procedures)\n   - Prescription medications (monthly estimate)\n3. Add validation for numeric inputs (positive numbers only)\n4. Calculate and display estimated annual totals for each category\n5. Implement a summary section showing total estimated annual out-of-pocket expenses\n6. Connect these fields to the household member data structure\n7. Ensure proper currency formatting for all monetary values\n\nTesting approach:\n- Test input validation for negative numbers and non-numeric entries\n- Verify calculations are correct for annual totals\n- Test that data is properly saved to the household member record\n- Check currency formatting across different expense amounts",
-          "status": "pending",
+          "status": "done",
           "parentTaskId": 14
         },
         {
