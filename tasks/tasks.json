@@ -482,7 +482,7 @@
       "id": 12,
       "title": "Build Utilities Module",
       "description": "Create the utilities section for electricity, water, gas/heating, internet, and mobile costs.",
-      "status": "pending",
+      "status": "done",
       "dependencies": [
         4
       ],
