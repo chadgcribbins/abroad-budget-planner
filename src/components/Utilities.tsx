@@ -3,59 +3,164 @@ import React from 'react';
 // Define the props for the Utilities component
 type UtilitiesProps = {
   electricity: number | '';
+  isSeasonalElectricity: boolean;
+  electricityWinter: number | '';
+  electricitySpring: number | '';
+  electricitySummer: number | '';
+  electricityFall: number | '';
+
   water: number | '';
+
   gasHeating: number | '';
+  isSeasonalGasHeating: boolean;
+  gasHeatingWinter: number | '';
+  gasHeatingSpring: number | '';
+  gasHeatingSummer: number | '';
+  gasHeatingFall: number | '';
+
   internet: number | '';
   mobile: number | '';
-  onUtilitiesChange: (key: keyof Omit<UtilitiesProps, 'onUtilitiesChange'>, value: string) => void;
+
+  // Unified change handler
+  onUtilitiesChange: (key: keyof Omit<UtilitiesProps, 'onUtilitiesChange'>, value: string | boolean) => void;
 };
 
 const Utilities: React.FC<UtilitiesProps> = ({ 
   electricity,
+  isSeasonalElectricity,
+  electricityWinter,
+  electricitySpring,
+  electricitySummer,
+  electricityFall,
   water,
   gasHeating,
+  isSeasonalGasHeating,
+  gasHeatingWinter,
+  gasHeatingSpring,
+  gasHeatingSummer,
+  gasHeatingFall,
   internet,
   mobile,
   onUtilitiesChange 
 }) => {
 
-  // Calculate total monthly utility cost
+  // Calculate seasonal average safely
+  const calculateSeasonalAverage = (
+    winter: number | '',
+    spring: number | '',
+    summer: number | '',
+    fall: number | ''
+  ): number => {
+    const values = [winter, spring, summer, fall];
+    const validValues = values.map(v => Number(v) || 0).filter(v => v >= 0);
+    return validValues.length > 0 ? validValues.reduce((a, b) => a + b, 0) / validValues.length : 0;
+  };
+
+  // Calculate total monthly utility cost, considering seasonal variations
   const calculateTotal = (): number => {
-    const values = [electricity, water, gasHeating, internet, mobile];
-    return values.reduce((sum: number, value) => sum + (Number(value) || 0), 0);
+    const electricityCost = isSeasonalElectricity 
+      ? calculateSeasonalAverage(electricityWinter, electricitySpring, electricitySummer, electricityFall)
+      : (Number(electricity) || 0);
+
+    const gasHeatingCost = isSeasonalGasHeating
+      ? calculateSeasonalAverage(gasHeatingWinter, gasHeatingSpring, gasHeatingSummer, gasHeatingFall)
+      : (Number(gasHeating) || 0);
+      
+    const waterCost = Number(water) || 0;
+    const internetCost = Number(internet) || 0;
+    const mobileCost = Number(mobile) || 0;
+
+    return electricityCost + gasHeatingCost + waterCost + internetCost + mobileCost;
   };
 
   const totalUtilities = calculateTotal();
 
+  // Handle number/empty string inputs
   const handleInputChange = (key: keyof Omit<UtilitiesProps, 'onUtilitiesChange'>, value: string) => {
-    // Basic validation: Allow only numbers (including decimals) and empty string
     if (/^\d*\.?\d*$/.test(value)) {
       onUtilitiesChange(key, value);
     }
   };
+
+  // Handle toggle changes
+  const handleToggleChange = (key: 'isSeasonalElectricity' | 'isSeasonalGasHeating', value: boolean) => {
+    onUtilitiesChange(key, value);
+  };
+
+  // Helper component for seasonal inputs
+  const SeasonalInputGroup: React.FC<{ 
+    baseKey: 'electricity' | 'gasHeating';
+    winter: number | '';
+    spring: number | '';
+    summer: number | '';
+    fall: number | '';
+   }> = ({ baseKey, winter, spring, summer, fall }) => (
+    <div className="grid grid-cols-2 md:grid-cols-4 gap-2 mt-1 col-span-3 md:col-span-1">
+      {[ {key: `${baseKey}Winter`, label: 'Winter', value: winter},
+        {key: `${baseKey}Spring`, label: 'Spring', value: spring},
+        {key: `${baseKey}Summer`, label: 'Summer', value: summer},
+        {key: `${baseKey}Fall`,   label: 'Fall',   value: fall}
+      ].map(season => (
+        <div key={season.key} className="form-control">
+          <label className="label label-text-alt pb-0">{season.label}</label>
+          <input 
+            type="number" 
+            min="0" 
+            step="0.01"
+            placeholder="€"
+            className="input input-bordered input-sm"
+            value={season.value}
+            onChange={(e) => handleInputChange(season.key as keyof Omit<UtilitiesProps, 'onUtilitiesChange'>, e.target.value)}
+          />
+        </div>
+      ))}
+    </div>
+   );
 
   return (
     <div className="card bg-base-100 shadow-xl mb-4">
       <div className="card-body">
         <h2 className="card-title">Utilities</h2>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-4">
-          {/* Electricity Input */}
-          <div className="form-control">
-            <label className="label"><span className="label-text">Electricity (€/month)</span></label>
-            <input 
-              type="number" 
-              min="0" 
-              step="0.01"
-              placeholder="e.g., 80"
-              className="input input-bordered" 
-              value={electricity}
-              onChange={(e) => handleInputChange('electricity', e.target.value)} 
-            />
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-x-4 gap-y-2 mt-4 items-start">
+          {/* --- Electricity --- */}
+          <div className="form-control md:col-span-1">
+            <label className="label justify-start gap-2">
+              <span className="label-text">Electricity (€/month)</span>
+              <input 
+                type="checkbox" 
+                className="toggle toggle-xs toggle-primary"
+                checked={isSeasonalElectricity}
+                onChange={(e) => handleToggleChange('isSeasonalElectricity', e.target.checked)}
+              />
+              <span className="label-text-alt">Seasonal?</span>
+            </label>
+            {!isSeasonalElectricity && (
+              <input 
+                type="number" 
+                min="0" 
+                step="0.01"
+                placeholder="e.g., 80"
+                className="input input-bordered" 
+                value={electricity}
+                onChange={(e) => handleInputChange('electricity', e.target.value)} 
+              />
+            )}
           </div>
+          {isSeasonalElectricity && (
+            <SeasonalInputGroup 
+              baseKey='electricity' 
+              winter={electricityWinter} 
+              spring={electricitySpring} 
+              summer={electricitySummer} 
+              fall={electricityFall} 
+            />
+          )}
+          {/* Spacer if not seasonal to maintain grid alignment */}
+          {!isSeasonalElectricity && <div className="hidden md:block md:col-span-2"></div>}
 
-          {/* Water Input */}
-          <div className="form-control">
+          {/* --- Water --- */}
+          <div className="form-control md:col-span-1">
             <label className="label"><span className="label-text">Water (€/month)</span></label>
             <input 
               type="number" 
@@ -67,23 +172,47 @@ const Utilities: React.FC<UtilitiesProps> = ({
               onChange={(e) => handleInputChange('water', e.target.value)} 
             />
           </div>
+          {/* Spacer */}
+          <div className="hidden md:block md:col-span-2"></div> 
 
-          {/* Gas/Heating Input */}
-          <div className="form-control">
-            <label className="label"><span className="label-text">Gas/Heating (€/month)</span></label>
-            <input 
-              type="number" 
-              min="0" 
-              step="0.01"
-              placeholder="e.g., 100" 
-              className="input input-bordered" 
-              value={gasHeating}
-              onChange={(e) => handleInputChange('gasHeating', e.target.value)} 
-            />
+          {/* --- Gas/Heating --- */}
+          <div className="form-control md:col-span-1">
+            <label className="label justify-start gap-2">
+              <span className="label-text">Gas/Heating (€/month)</span>
+              <input 
+                type="checkbox" 
+                className="toggle toggle-xs toggle-primary"
+                checked={isSeasonalGasHeating}
+                onChange={(e) => handleToggleChange('isSeasonalGasHeating', e.target.checked)}
+              />
+              <span className="label-text-alt">Seasonal?</span>
+            </label>
+            {!isSeasonalGasHeating && (
+              <input 
+                type="number" 
+                min="0" 
+                step="0.01"
+                placeholder="e.g., 100" 
+                className="input input-bordered" 
+                value={gasHeating}
+                onChange={(e) => handleInputChange('gasHeating', e.target.value)} 
+              />
+            )}
           </div>
+          {isSeasonalGasHeating && (
+            <SeasonalInputGroup 
+              baseKey='gasHeating' 
+              winter={gasHeatingWinter} 
+              spring={gasHeatingSpring} 
+              summer={gasHeatingSummer} 
+              fall={gasHeatingFall} 
+            />
+          )}
+          {/* Spacer if not seasonal */}
+          {!isSeasonalGasHeating && <div className="hidden md:block md:col-span-2"></div>}
 
-          {/* Internet Input */}
-          <div className="form-control">
+          {/* --- Internet --- */}
+          <div className="form-control md:col-span-1">
             <label className="label"><span className="label-text">Internet (€/month)</span></label>
             <input 
               type="number" 
@@ -95,9 +224,11 @@ const Utilities: React.FC<UtilitiesProps> = ({
               onChange={(e) => handleInputChange('internet', e.target.value)} 
             />
           </div>
+           {/* Spacer */}
+           <div className="hidden md:block md:col-span-2"></div> 
 
-          {/* Mobile Input */}
-          <div className="form-control">
+          {/* --- Mobile --- */}
+          <div className="form-control md:col-span-1">
             <label className="label"><span className="label-text">Mobile (€/month)</span></label>
             <input 
               type="number" 
@@ -109,12 +240,14 @@ const Utilities: React.FC<UtilitiesProps> = ({
               onChange={(e) => handleInputChange('mobile', e.target.value)} 
             />
           </div>
+           {/* Spacer */}
+           <div className="hidden md:block md:col-span-2"></div> 
         </div>
 
         {/* Total Display */}
-        <div className="mt-4 p-2 bg-base-200 rounded">
-          <p className="text-sm font-semibold">Total Monthly Utilities:</p>
-          <p className="text-lg">€ {totalUtilities.toFixed(2)}</p>
+        <div className="mt-6 pt-4 border-t border-base-300">
+          <p className="text-sm font-semibold text-right">Total Monthly Utilities:</p>
+          <p className="text-xl font-bold text-right">€ {totalUtilities.toFixed(2)}</p>
         </div>
       </div>
     </div>
