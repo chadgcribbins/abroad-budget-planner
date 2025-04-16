@@ -30,3 +30,38 @@ export const calculateFeltCost = (
   // Gross = Net / (1 - TaxRate)
   return expenseAmount / (1 - effectiveTaxRatePercent / 100);
 }; 
+
+/**
+ * Formats a number or an empty string for display in an input field, adding commas.
+ * Handles potentially empty strings or null/undefined values gracefully.
+ * @param value The number or string to format.
+ * @returns A formatted string (e.g., "1,234.56") or an empty string.
+ */
+export const formatNumberInput = (value: number | string | null | undefined): string => {
+  if (value === null || value === undefined || value === '') {
+    return '';
+  }
+  const num = Number(value);
+  if (isNaN(num)) {
+    return ''; // Handle cases where conversion to number fails
+  }
+  // Use Intl.NumberFormat for locale-aware formatting
+  return new Intl.NumberFormat().format(num);
+};
+
+/**
+ * Parses a formatted number string (e.g., "1,234.56") back into a number.
+ * Removes commas before parsing.
+ * @param value The formatted string.
+ * @returns The parsed number, or NaN if parsing fails.
+ */
+export const parseFormattedNumber = (value: string): number => {
+  if (value === null || value === undefined || typeof value !== 'string') {
+    return NaN;
+  }
+  const cleanedValue = value.replace(/,/g, '');
+  if (cleanedValue === '') {
+    return NaN; // Or potentially 0, depending on desired behavior for empty input
+  }
+  return Number(cleanedValue);
+}; 

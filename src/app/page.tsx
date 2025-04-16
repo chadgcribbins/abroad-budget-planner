@@ -12,17 +12,33 @@ import { TransportProvider } from '@/context/TransportContext';
 import { LifestyleModule } from '@/components/Lifestyle/LifestyleModule';
 import Utilities from '@/components/Utilities';
 import Education from '@/components/Education';
+import Healthcare from '@/components/Healthcare';
 
 // Define types for household state
 const ageGroups = [
   'Baby', 'Primary', 'Secondary', 'College', 'Adult', 'Parent', 'Grandparent'
 ] as const;
 type AgeGroup = typeof ageGroups[number];
-type HouseholdComposition = { [K in AgeGroup]: number };
+export type HouseholdComposition = { [K in AgeGroup]: number };
 
 // Define types for Education state
 type EducationChoice = 'public' | 'private';
-type EducationState = { [childKey: string]: EducationChoice };
+type EducationDetails = {
+  choice: EducationChoice;
+  annualTuition?: number | '';
+  extraCosts?: number | '';
+};
+type EducationState = { [childKey: string]: EducationDetails };
+
+// Define types for Healthcare state
+export type CoverageType = 'Public' | 'Private' | 'Hybrid';
+export type HealthcareDetails = {
+  type: CoverageType;
+  monthlyPremium?: number | '';
+  oopEstimate?: number | ''; // Out-of-pocket estimate (GP, Dental, Prescriptions combined for now)
+  recurringMedical?: number | ''; // Known recurring costs
+};
+export type HealthcareState = { [memberKey: string]: HealthcareDetails };
 
 export default function Home() {
   const [originCountry, setOriginCountry] = useState<string | null>(null);
@@ -74,8 +90,11 @@ export default function Home() {
   const [internet, setInternet] = useState<number | ''>(50);
   const [mobile, setMobile] = useState<number | ''>(30);
 
-  // Add state for Education Choices
-  const [educationChoices, setEducationChoices] = useState<EducationState>({});
+  // Add state for Education Choices (now includes details)
+  const [educationState, setEducationState] = useState<EducationState>({});
+
+  // Add state for Healthcare Choices
+  const [healthcareState, setHealthcareState] = useState<HealthcareState>({});
 
   // TODO: Add state for other expense modules (Transport, Lifestyle, etc.)
 
@@ -145,8 +164,26 @@ export default function Home() {
   };
 
   // Handler for Education state changes
-  const handleEducationChange = (childKey: string, choice: EducationChoice) => {
-    setEducationChoices(prev => ({ ...prev, [childKey]: choice }));
+  // Updated to handle partial updates to EducationDetails
+  const handleEducationChange = (childKey: string, detailsUpdate: Partial<EducationDetails>) => {
+    setEducationState(prev => ({
+      ...prev,
+      [childKey]: {
+        ...(prev[childKey] || { choice: 'public' }), // Ensure existing state or default
+        ...detailsUpdate,
+      },
+    }));
+  };
+
+  // Handler for Healthcare state changes
+  const handleHealthcareChange = (memberKey: string, detailsUpdate: Partial<HealthcareDetails>) => {
+    setHealthcareState(prev => ({
+      ...prev,
+      [memberKey]: {
+        ...(prev[memberKey] || { type: 'Public' }), // Default to Public
+        ...detailsUpdate,
+      },
+    }));
   };
 
   const handleDestinationChange = (countryCode: string | null) => {
@@ -233,8 +270,15 @@ export default function Home() {
         {/* Render Education Module */}
         <Education
           household={household}
-          educationChoices={educationChoices}
+          educationState={educationState}
           onEducationChange={handleEducationChange}
+        />
+
+        {/* Render Healthcare Module */}
+        <Healthcare
+          household={household}
+          healthcareState={healthcareState}
+          onHealthcareChange={handleHealthcareChange}
         />
 
         <TransportModule />

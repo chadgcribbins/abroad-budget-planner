@@ -528,7 +528,7 @@
       "id": 13,
       "title": "Implement Education Module",
       "description": "Build the education section with public/private toggle and associated costs.",
-      "status": "pending",
+      "status": "done",
       "dependencies": [
         4,
         6
@@ -543,7 +543,7 @@
           "description": "Implement the core education module structure with public/private education toggle for each child",
           "dependencies": [],
           "details": "Implementation steps:\n1. Create an Education component that integrates with the existing household data structure\n2. Add a public/private toggle switch for each child in the household\n3. Implement conditional rendering based on the education type selection\n4. Store education type selection in state for each child\n5. Create the basic layout structure for the education module\n6. Add validation to ensure each child has an education type selected\n\nTesting approach:\n- Verify the toggle works correctly for each child\n- Confirm the UI updates appropriately when switching between public and private\n- Test with various household compositions (different numbers of children)\n- Ensure state is properly maintained when navigating between sections\n\n<info added on 2025-04-16T21:38:01.533Z>\nI've reviewed the implementation and can provide these additional technical details:\n\nFor the Education.tsx component:\n- Use a Map structure like `Map<string, 'public' | 'private'>` for the education type state to ensure type safety\n- Implement the toggle using the existing design system's Toggle component with proper ARIA attributes\n- Add data-testid attributes (e.g., `data-testid=\"education-toggle-primary-0\"`) to facilitate testing\n\nState management improvements:\n- Structure the state object as `{[childId: string]: {educationType: 'public' | 'private', gradeLevel?: string}}` to accommodate future education details\n- Use React.useReducer instead of useState for more predictable state transitions when handling multiple children\n\nValidation implementation:\n- Add form validation using the existing validation framework\n- Create a validateEducation() function that returns error messages for any child missing an education type\n- Connect validation to the \"Continue\" button's onClick handler\n\nFor conditional rendering:\n- Implement a getEducationFormByType(type: 'public' | 'private', childData) function that returns the appropriate form components\n- Use React.memo to prevent unnecessary re-renders when toggling between children\n</info added on 2025-04-16T21:38:01.533Z>",
-          "status": "in-progress",
+          "status": "done",
           "parentTaskId": 13
         },
         {
@@ -553,8 +553,8 @@
           "dependencies": [
             1
           ],
-          "details": "Implementation steps:\n1. Create input fields for annual tuition costs that appear only when private education is selected\n2. Add input fields for additional education expenses (books, uniforms, activities, etc.)\n3. Implement proper number formatting and validation for all cost inputs\n4. Create helper functions to convert annual costs to monthly amounts\n5. Store all education cost data in the application state\n6. Ensure inputs have appropriate labels and help text\n\nTesting approach:\n- Test input validation for all fields (negative numbers, non-numeric input, etc.)\n- Verify conditional rendering works correctly based on education type\n- Test data persistence when switching between children or sections\n- Confirm proper number formatting for currency inputs",
-          "status": "pending",
+          "details": "Implementation steps:\n1. Create input fields for annual tuition costs that appear only when private education is selected\n2. Add input fields for additional education expenses (books, uniforms, activities, etc.)\n3. Implement proper number formatting and validation for all cost inputs\n4. Create helper functions to convert annual costs to monthly amounts\n5. Store all education cost data in the application state\n6. Ensure inputs have appropriate labels and help text\n\nTesting approach:\n- Test input validation for all fields (negative numbers, non-numeric input, etc.)\n- Verify conditional rendering works correctly based on education type\n- Test data persistence when switching between children or sections\n- Confirm proper number formatting for currency inputs\n\n<info added on 2025-04-16T21:43:19.219Z>\nFor the \"Implement Private Education Cost Inputs\" subtask:\n\nThe implementation in Education.tsx uses React's conditional rendering with the ternary operator to show/hide tuition fields based on the `educationType` state value. Cost input fields are wrapped in a `CostInputGroup` component that handles formatting and validation.\n\nState management updates in page.tsx include:\n```typescript\ninterface EducationCosts {\n  annualTuition: number;\n  books: number;\n  uniforms: number;\n  activities: number;\n  other: number;\n}\n\ninterface ChildEducation {\n  type: 'public' | 'private' | 'homeschool';\n  costs: EducationCosts;\n}\n```\n\nNumber formatting utilities in utils/formatting.ts:\n```typescript\nexport const formatCurrency = (value: number): string => {\n  return new Intl.NumberFormat('en-US', {\n    style: 'currency',\n    currency: 'USD',\n    minimumFractionDigits: 0,\n    maximumFractionDigits: 0\n  }).format(value);\n};\n\nexport const parseInputToNumber = (input: string): number => {\n  return Number(input.replace(/[^0-9.-]+/g, ''));\n};\n```\n\nAdded monthly calculation helper:\n```typescript\nexport const calculateMonthlyFromAnnual = (annualAmount: number): number => {\n  return annualAmount / 12;\n};\n```\n</info added on 2025-04-16T21:43:19.219Z>",
+          "status": "done",
           "parentTaskId": 13
         },
         {
@@ -565,8 +565,8 @@
             1,
             2
           ],
-          "details": "Implementation steps:\n1. Create functions to calculate total education costs per child (tuition + additional costs)\n2. Implement monthly payment breakdown calculations for each child\n3. Add a summary section showing education costs per child\n4. Calculate and display total household education expenses\n5. Integrate education totals with the overall household budget calculations\n6. Add visual elements (charts or tables) to display the education cost breakdown\n\nTesting approach:\n- Verify calculations are correct for various input scenarios\n- Test with multiple children having different education types\n- Confirm monthly breakdowns are calculated correctly\n- Check that household totals accurately reflect the sum of all children's education costs\n- Test integration with the overall budget summary",
-          "status": "pending",
+          "details": "Implementation steps:\n1. Create functions to calculate total education costs per child (tuition + additional costs)\n2. Implement monthly payment breakdown calculations for each child\n3. Add a summary section showing education costs per child\n4. Calculate and display total household education expenses\n5. Integrate education totals with the overall household budget calculations\n6. Add visual elements (charts or tables) to display the education cost breakdown\n\nTesting approach:\n- Verify calculations are correct for various input scenarios\n- Test with multiple children having different education types\n- Confirm monthly breakdowns are calculated correctly\n- Check that household totals accurately reflect the sum of all children's education costs\n- Test integration with the overall budget summary\n\n<info added on 2025-04-16T22:11:03.307Z>\nFor the Education.tsx component, I've implemented the calculation logic using React's useMemo hook for performance optimization. Here's the specific implementation:\n\n```tsx\n// Education cost calculation using useMemo for performance\nconst educationCosts = useMemo(() => {\n  return children.map(child => {\n    const tuition = parseFloat(child.tuition || '0');\n    const additionalCosts = parseFloat(child.additionalCosts || '0');\n    const annualTotal = tuition + additionalCosts;\n    const monthlyTotal = annualTotal / 12;\n    \n    return {\n      childId: child.id,\n      childName: child.name,\n      annualTuition: tuition,\n      annualAdditionalCosts: additionalCosts,\n      annualTotal,\n      monthlyTotal\n    };\n  });\n}, [children]);\n\n// Calculate household totals\nconst householdTotals = useMemo(() => {\n  const annual = educationCosts.reduce((sum, child) => sum + child.annualTotal, 0);\n  return {\n    annual,\n    monthly: annual / 12\n  };\n}, [educationCosts]);\n```\n\nAdded a summary section at the bottom of the Education card:\n\n```tsx\n<Box mt={4} p={3} bgcolor=\"rgba(0,0,0,0.03)\" borderRadius={1}>\n  <Typography variant=\"h6\" gutterBottom>Education Cost Summary</Typography>\n  <Grid container spacing={2}>\n    {educationCosts.map(child => (\n      <Grid item xs={12} sm={6} md={4} key={child.childId}>\n        <Paper elevation={1} sx={{ p: 2 }}>\n          <Typography variant=\"subtitle1\">{child.childName}</Typography>\n          <Typography>Monthly: ${child.monthlyTotal.toFixed(2)}</Typography>\n          <Typography>Annual: ${child.annualTotal.toFixed(2)}</Typography>\n        </Paper>\n      </Grid>\n    ))}\n    <Grid item xs={12}>\n      <Paper elevation={2} sx={{ p: 2, bgcolor: \"primary.light\", color: \"primary.contrastText\" }}>\n        <Typography variant=\"h6\">Household Education Totals</Typography>\n        <Typography variant=\"h5\">${householdTotals.monthly.toFixed(2)}/month</Typography>\n        <Typography>${householdTotals.annual.toFixed(2)}/year</Typography>\n      </Paper>\n    </Grid>\n  </Grid>\n</Box>\n```\n\nImplemented conditional display of per-child monthly costs in the child education form:\n\n```tsx\n{child.tuition && child.tuition !== '0' && (\n  <Typography variant=\"body2\" color=\"text.secondary\" sx={{ mt: 1 }}>\n    Monthly cost: ${(parseFloat(child.tuition || '0') / 12).toFixed(2)}\n  </Typography>\n)}\n```\n</info added on 2025-04-16T22:11:03.307Z>",
+          "status": "done",
           "parentTaskId": 13
         }
       ]
@@ -582,7 +582,41 @@
       ],
       "priority": "medium",
       "details": "Implement healthcare type selection (Public, Private, Hybrid) for each household member. Include monthly premium inputs for private options. Add estimated out-of-pocket expense fields for GP visits, dental, and prescriptions. Include section for known recurring medical costs.",
-      "testStrategy": "Test that healthcare options appear for each household member. Verify healthcare cost calculations are correct based on selected options."
+      "testStrategy": "Test that healthcare options appear for each household member. Verify healthcare cost calculations are correct based on selected options.",
+      "subtasks": [
+        {
+          "id": 1,
+          "title": "Create Healthcare Coverage Type Selection Component",
+          "description": "Develop a component that allows users to select healthcare coverage type (Public, Private, Hybrid) for each household member",
+          "dependencies": [],
+          "details": "Implementation details:\n1. Create a new component called 'HealthcareCoverageSelector'\n2. Implement a dropdown selection for coverage types (Public, Private, Hybrid)\n3. Design the component to be reusable for each household member\n4. Add validation to ensure a selection is made\n5. Connect the component to the household member data structure\n6. Include conditional rendering that shows premium input fields only when Private or Hybrid is selected\n7. Style the component according to the application's design system\n\nTesting approach:\n- Verify all three options appear in the dropdown\n- Test that the component correctly associates selections with the right household member\n- Confirm conditional fields appear/disappear based on selection\n- Test validation behavior when no selection is made",
+          "status": "done",
+          "parentTaskId": 14
+        },
+        {
+          "id": 2,
+          "title": "Implement Out-of-Pocket Expense Estimation Fields",
+          "description": "Create input fields for estimating out-of-pocket healthcare expenses including GP visits, dental, and prescriptions",
+          "dependencies": [
+            1
+          ],
+          "details": "Implementation details:\n1. Create a new component called 'OutOfPocketExpenseEstimator'\n2. Implement separate numeric input fields for:\n   - GP visit costs (per visit and estimated annual frequency)\n   - Dental expenses (routine and special procedures)\n   - Prescription medications (monthly estimate)\n3. Add validation for numeric inputs (positive numbers only)\n4. Calculate and display estimated annual totals for each category\n5. Implement a summary section showing total estimated annual out-of-pocket expenses\n6. Connect these fields to the household member data structure\n7. Ensure proper currency formatting for all monetary values\n\nTesting approach:\n- Test input validation for negative numbers and non-numeric entries\n- Verify calculations are correct for annual totals\n- Test that data is properly saved to the household member record\n- Check currency formatting across different expense amounts",
+          "status": "pending",
+          "parentTaskId": 14
+        },
+        {
+          "id": 3,
+          "title": "Develop Recurring Medical Costs Tracker",
+          "description": "Create a section for tracking known recurring medical costs and integrate the entire healthcare module with the household data structure",
+          "dependencies": [
+            1,
+            2
+          ],
+          "details": "Implementation details:\n1. Create a 'RecurringMedicalCostsTracker' component with:\n   - Ability to add multiple recurring costs (name, amount, frequency)\n   - Option to specify which household member the cost applies to\n   - Delete and edit functionality for existing entries\n2. Implement a summary view showing total recurring costs per month/year\n3. Integrate all healthcare components (coverage selection, out-of-pocket estimator, recurring costs) into a cohesive Healthcare Module\n4. Connect the complete module to the main application's state management\n5. Implement data persistence for all healthcare-related inputs\n6. Add a summary dashboard showing total healthcare costs across all household members\n7. Ensure the module works with the existing household member management system\n\nTesting approach:\n- Test adding, editing, and removing recurring costs\n- Verify calculations for different frequency options (weekly, monthly, quarterly, annually)\n- Test the integration with the main application state\n- Verify data persistence works correctly\n- Test the complete healthcare module with multiple household members having different healthcare scenarios",
+          "status": "pending",
+          "parentTaskId": 14
+        }
+      ]
     },
     {
       "id": 15,
