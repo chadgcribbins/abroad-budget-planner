@@ -21,7 +21,7 @@ interface HomeServiceState {
 // Define and export keys for type safety
 export type HomeServiceName = 'cleaner' | 'babysitter' | 'gardening' | 'petCare';
 
-interface LifestyleState {
+export interface LifestyleState {
   generalShoppingSpend: {
     amount: number | string; 
     frequency: 'monthly' | 'annual';

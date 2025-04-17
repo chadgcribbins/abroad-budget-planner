@@ -2,7 +2,8 @@
 
 import React, { useMemo } from 'react';
 import HealthcareCoverageSelector from './HealthcareCoverageSelector';
-import { type HouseholdComposition, type HealthcareState, type HealthcareDetails, type CoverageType } from '../app/page';
+import { type HouseholdComposition } from '@/types/household.types';
+import { type HealthcareState, type HealthcareDetails, type CoverageType } from '@/types/healthcare.types';
 import { formatNumberInput, parseFormattedNumber } from '@/utils/transformations/financial.transformations';
 import { useCurrency } from '@/context/CurrencyContext';
 import { formatDualCurrency } from '@/utils/formatting';

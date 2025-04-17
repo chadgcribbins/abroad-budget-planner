@@ -20,4 +20,18 @@ export interface ChildcareDetails {
 export interface Education {
   schooling: SchoolingDetails[]; // Array to cover multiple children
   childcare: ChildcareDetails[]; // Array for pre-school children
-} 
+}
+
+/**
+ * @file Defines TypeScript types for the Education module state.
+ */
+
+export type EducationChoice = 'public' | 'private';
+
+export type EducationDetails = {
+  choice: EducationChoice;
+  annualTuition?: number | '';
+  extraCosts?: number | '';
+};
+
+export type EducationState = { [childKey: string]: EducationDetails }; 

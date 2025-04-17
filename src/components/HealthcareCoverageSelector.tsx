@@ -1,7 +1,7 @@
 'use client';
 
 import React from 'react';
-import { type HealthcareDetails, type CoverageType } from '../app/page'; // Import necessary types
+import { type HealthcareDetails, type CoverageType } from '@/types/healthcare.types'; // Corrected path
 
 // Define props interface
 interface HealthcareCoverageSelectorProps {

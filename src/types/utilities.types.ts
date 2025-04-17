@@ -1,3 +1,27 @@
+/**
+ * @file Defines TypeScript types for Utilities module state.
+ */
+
+// Represents the state shape needed for calculations,
+// mirrors the state managed in AppBudgetContext or page.tsx initially.
+export interface UtilitiesState {
+  electricity?: number | '';
+  isSeasonalElectricity?: boolean;
+  electricityWinter?: number | '';
+  electricitySpring?: number | '';
+  electricitySummer?: number | '';
+  electricityFall?: number | '';
+  water?: number | '';
+  gasHeating?: number | '';
+  isSeasonalGasHeating?: boolean;
+  gasHeatingWinter?: number | '';
+  gasHeatingSpring?: number | '';
+  gasHeatingSummer?: number | '';
+  gasHeatingFall?: number | '';
+  internet?: number | '';
+  mobile?: number | '';
+}
+
 export interface Utilities {
   monthlyElectricity?: number;
   monthlyWater?: number;

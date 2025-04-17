@@ -1,11 +1,14 @@
-export type AgeGroup =
-  | 'Baby' // 0-2
-  | 'Primary' // 3-11
-  | 'Secondary' // 12-17
-  | 'College' // 18-22
-  | 'Adult' // 23-64
-  | 'Parent' // Specific role, usually Adult age
-  | 'Grandparent'; // Usually 65+
+/**
+ * @file Defines TypeScript types for household composition.
+ */
+
+export const ageGroups = [
+  'Baby', 'Primary', 'Secondary', 'College', 'Adult', 'Parent', 'Grandparent'
+] as const;
+
+export type AgeGroup = typeof ageGroups[number];
+
+export type HouseholdComposition = { [K in AgeGroup]: number };
 
 export interface HouseholdMember {
   id: string; // Unique ID for list mapping or future identification

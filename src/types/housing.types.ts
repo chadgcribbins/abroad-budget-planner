@@ -1,3 +1,22 @@
+/**
+ * @file Defines TypeScript types for Housing module state.
+ */
+
+// Represents the state shape needed for calculations,
+// mirrors the state managed in AppBudgetContext or page.tsx initially.
+export interface HousingState {
+  isBuying: boolean;
+  monthlyRent?: number | '';
+  propertyPrice?: number | '';
+  downPaymentPercentage?: number | '';
+  mortgageTermYears?: number | '';
+  mortgageInterestRate?: number | '';
+  annualMaintenance?: number | '';
+  annualInsurance?: number | '';
+  annualPropertyTax?: number | '';
+  futureUpgradeCost?: number | ''; // Included for completeness, not used in fixed cost calc
+}
+
 export type HousingType = 'Rent' | 'Buy';
 
 export interface MortgageDetails {

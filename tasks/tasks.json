@@ -622,7 +622,7 @@
       "id": 15,
       "title": "Build Emergency Buffer Calculator",
       "description": "Implement the emergency savings buffer calculator with runway visualization.",
-      "status": "pending",
+      "status": "done",
       "dependencies": [
         8,
         9,
@@ -642,7 +642,7 @@
           "description": "Define the data structure to store emergency buffer information including target months, current reserve amount, and fixed expenses.",
           "dependencies": [],
           "details": "Implementation steps:\n1. Create a new EmergencyBufferModel class with properties for targetMonths, currentReserve, and fixedExpenses\n2. Add methods to calculate total monthly fixed expenses\n3. Add method to calculate current runway (months of coverage)\n4. Implement data validation for inputs\n5. Create unit tests to verify calculations\n\nTesting approach:\n- Test calculation accuracy with various input combinations\n- Verify edge cases (zero expenses, zero reserve, etc.)\n- Ensure proper data validation",
-          "status": "pending",
+          "status": "done",
           "parentTaskId": 15
         },
         {
@@ -653,7 +653,7 @@
             1
           ],
           "details": "Implementation steps:\n1. Create a service to fetch existing expense data from other modules\n2. Implement logic to filter and identify fixed expenses\n3. Calculate total monthly fixed expenses\n4. Add caching mechanism to avoid recalculating when expense data hasn't changed\n5. Connect this service to the EmergencyBufferModel\n\nTesting approach:\n- Mock expense data sources for testing\n- Verify correct identification of fixed expenses\n- Test aggregation with various expense scenarios\n- Ensure proper error handling for missing data",
-          "status": "pending",
+          "status": "done",
           "parentTaskId": 15
         },
         {
@@ -664,7 +664,7 @@
             1
           ],
           "details": "Implementation steps:\n1. Create form inputs for target months (slider or number input)\n2. Add input for current emergency reserve amount\n3. Implement real-time validation with appropriate feedback\n4. Connect inputs to the EmergencyBufferModel\n5. Add help text explaining each input's purpose\n\nTesting approach:\n- Test input validation for various scenarios\n- Verify UI updates when model changes\n- Test accessibility compliance\n- Ensure responsive design works on different screen sizes",
-          "status": "pending",
+          "status": "done",
           "parentTaskId": 15
         },
         {
@@ -677,7 +677,7 @@
             3
           ],
           "details": "Implementation steps:\n1. Design a visual meter component (progress bar, gauge, etc.)\n2. Implement color coding based on coverage status (red for < 3 months, yellow for 3-5, green for 6+)\n3. Add animations for transitions between states\n4. Display numeric values alongside visual representation\n5. Ensure the visualization updates when inputs change\n\nTesting approach:\n- Test rendering with different data scenarios\n- Verify color changes at appropriate thresholds\n- Test animation behavior\n- Ensure accessibility for color-blind users (include text indicators)",
-          "status": "pending",
+          "status": "done",
           "parentTaskId": 15
         },
         {
@@ -690,7 +690,7 @@
             4
           ],
           "details": "Implementation steps:\n1. Define a set of recommendation rules based on financial best practices\n2. Implement logic to select appropriate recommendations based on:\n   - Current runway vs target months\n   - Fixed expense ratio to income\n   - Current savings rate\n3. Create UI components to display recommendations\n4. Add links to educational resources for each recommendation\n5. Implement priority sorting for recommendations\n\nTesting approach:\n- Test recommendation generation with various financial scenarios\n- Verify correct prioritization of advice\n- Test UI rendering of recommendations\n- Ensure recommendations are actionable and clear",
-          "status": "pending",
+          "status": "done",
           "parentTaskId": 15
         }
       ]
@@ -782,7 +782,7 @@
       "id": 17,
       "title": "Develop Dashboard Summary View",
       "description": "Create the comprehensive dashboard summary with key financial metrics.",
-      "status": "pending",
+      "status": "done",
       "dependencies": [
         8,
         9,
@@ -804,7 +804,7 @@
           "description": "Implement the basic dashboard layout with placeholders for all summary components and create the structure for summary cards showing monthly and annual income/expenses.",
           "dependencies": [],
           "details": "1. Design a responsive grid layout for the dashboard with appropriate spacing and sections\n2. Create reusable card components with title, value, and optional comparison indicators\n3. Implement placeholder cards for total monthly income, monthly expenses, annual income, and annual expenses\n4. Add styling for positive/negative values with appropriate color coding\n5. Ensure mobile responsiveness with appropriate breakpoints\n6. Test the layout across different screen sizes and ensure all placeholders render correctly",
-          "status": "pending",
+          "status": "done",
           "parentTaskId": 17
         },
         {
@@ -815,7 +815,7 @@
             1
           ],
           "details": "1. Create data aggregation functions to sum all income sources by month and year\n2. Implement expense aggregation functions to total all expenses by month and year\n3. Connect the summary cards created in subtask 1 to these calculation functions\n4. Add number formatting with appropriate currency symbols and decimal places\n5. Implement comparison with previous period (month/year) if historical data is available\n6. Test with various income and expense scenarios to verify calculations\n7. Add loading states for when calculations are in progress",
-          "status": "pending",
+          "status": "done",
           "parentTaskId": 17
         },
         {
@@ -826,7 +826,7 @@
             2
           ],
           "details": "1. Create a projection algorithm that calculates disposable income (income minus expenses) over time\n2. Implement a visualization component (chart or graph) to display the projection\n3. Add toggles for monthly vs. annual view\n4. Include a summary card showing current disposable income and projected change\n5. Add tooltip explanations for the projection methodology\n6. Implement color coding to indicate positive/negative trends\n7. Test with various income/expense scenarios to verify projection accuracy\n8. Ensure the component updates when underlying data changes",
-          "status": "pending",
+          "status": "done",
           "parentTaskId": 17
         },
         {
@@ -837,7 +837,7 @@
             2
           ],
           "details": "1. Design an input interface for users to set their lifestyle target\n2. Implement the calculation logic that factors in taxes and expenses to determine required gross income\n3. Create a visual indicator showing the gap between current and required income\n4. Add explanatory text about how the calculation works\n5. Implement sensitivity analysis to show how changes in expenses affect required income\n6. Test with various tax scenarios and lifestyle targets\n7. Add the ability to save target lifestyle goals",
-          "status": "pending",
+          "status": "done",
           "parentTaskId": 17
         },
         {
@@ -848,7 +848,7 @@
             2
           ],
           "details": "1. Create input fields for private school tuition costs\n2. Implement calculation logic for tax savings under NHR status\n3. Calculate the net 'felt cost' after tax considerations\n4. Create a comparative visualization showing costs with and without NHR benefits\n5. Add explanatory tooltips about the NHR program and how it affects education costs\n6. Include a summary card showing the annual savings from NHR status\n7. Test with various tuition costs and tax scenarios\n8. Ensure all calculations update when tax parameters change",
-          "status": "pending",
+          "status": "done",
           "parentTaskId": 17
         },
         {
@@ -859,7 +859,7 @@
             2
           ],
           "details": "1. Design a side-by-side comparison layout for rent vs. buy scenarios\n2. Implement calculation logic for total cost of ownership for buying (mortgage, taxes, maintenance, appreciation)\n3. Create calculation logic for total rental costs over time\n4. Develop an interactive chart showing the crossover point where buying becomes more economical than renting\n5. Add sliders for key variables (interest rates, property appreciation, rent increases)\n6. Include a summary of key metrics (break-even time, 5-year cost difference, etc.)\n7. Test with various property values, rental rates, and timeframes\n8. Ensure all visualizations update dynamically when inputs change",
-          "status": "pending",
+          "status": "done",
           "parentTaskId": 17
         },
         {
@@ -873,7 +873,7 @@
             6
           ],
           "details": "1. Design a scenario management UI with save, clone, and delete options\n2. Implement data structure for storing complete scenario configurations\n3. Create save functionality that captures all current dashboard settings and calculations\n4. Implement clone functionality to duplicate scenarios for comparison\n5. Add a scenario selector dropdown or tabs in the dashboard header\n6. Create a comparison view to see multiple scenarios side by side\n7. Implement local storage or database persistence for saved scenarios\n8. Test scenario switching to ensure all dashboard components update correctly\n9. Add export/import functionality for scenarios",
-          "status": "pending",
+          "status": "done",
           "parentTaskId": 17
         }
       ]
