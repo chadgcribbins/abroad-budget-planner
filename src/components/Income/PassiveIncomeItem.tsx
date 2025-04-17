@@ -1,8 +1,9 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { PassiveIncome, IncomeFrequency } from '../../types/income.types';
 import { useCurrency } from '../../context/CurrencyContext';
+import { formatSingleCurrency } from '@/utils/formatting';
 
 interface PassiveIncomeItemProps {
   item: PassiveIncome;
@@ -15,42 +16,83 @@ const incomeFrequencies: IncomeFrequency[] = ['Annual', 'Monthly', 'Quarterly', 
 const PassiveIncomeItem: React.FC<PassiveIncomeItemProps> = ({ 
     item, 
     onUpdate, 
-    onRemove 
+    onRemove,
 }) => {
-  const { rates, isLoading: currencyLoading } = useCurrency();
+  const {
+    isLoading: currencyLoading,
+    originCurrency,
+    targetCurrency,
+    effectiveRate
+  } = useCurrency();
 
-  // Internal state for editing
   const [type, setType] = useState<string>(item.type);
   const [amount, setAmount] = useState<string>(item.amount.toString());
   const [frequency, setFrequency] = useState<IncomeFrequency>(item.frequency);
-  const [currency, setCurrency] = useState<string>(item.currency);
+  const [selectedCurrency, setSelectedCurrency] = useState<string>(item.currency || originCurrency || '');
   const [sourceCountry, setSourceCountry] = useState<string>(item.sourceCountry || '');
 
-  // Effect to call onUpdate when internal state changes and is valid
+  useEffect(() => {
+    setType(item.type);
+    setAmount(item.amount.toString());
+    setFrequency(item.frequency);
+    setSelectedCurrency(item.currency || originCurrency || '');
+    setSourceCountry(item.sourceCountry || '');
+  }, [item, originCurrency]);
+
   useEffect(() => {
     const numericAmount = parseFloat(amount);
-    if (!isNaN(numericAmount) && numericAmount >= 0 && type && currency && frequency) {
+    if (!isNaN(numericAmount) && numericAmount >= 0 && type && selectedCurrency && frequency) {
       const updatedItem: PassiveIncome = {
         id: item.id,
         type,
         amount: numericAmount,
         frequency,
-        currency,
+        currency: selectedCurrency,
         sourceCountry: sourceCountry || undefined,
       };
-      // Prevent infinite loops
-      if (JSON.stringify(updatedItem) !== JSON.stringify(item)) {
+      if (
+        updatedItem.type !== item.type ||
+        updatedItem.amount !== item.amount || 
+        updatedItem.frequency !== item.frequency ||
+        updatedItem.currency !== item.currency ||
+        updatedItem.sourceCountry !== item.sourceCountry
+      ) {
         onUpdate(updatedItem);
       }
     }
-    // No need to call onUpdate(undefined) here as we always have an ID
-    // The parent handles the list; invalid intermediate state is okay temporarily
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [type, amount, frequency, currency, sourceCountry, item.id /* item, onUpdate */]);
+  }, [type, amount, frequency, selectedCurrency, sourceCountry, item.id]);
+
+  const annualEquivalentInDestination = useMemo(() => {
+    const numericAmount = parseFloat(amount);
+    if (isNaN(numericAmount) || !selectedCurrency || !targetCurrency) {
+      return null;
+    }
+
+    let annualAmountInSelected = 0;
+    switch (frequency) {
+        case 'Annual': annualAmountInSelected = numericAmount; break;
+        case 'Monthly': annualAmountInSelected = numericAmount * 12; break;
+        case 'Quarterly': annualAmountInSelected = numericAmount * 4; break;
+        case 'Yearly': annualAmountInSelected = numericAmount; break; 
+        default: return null;
+    }
+
+    if (selectedCurrency === targetCurrency) {
+      return annualAmountInSelected;
+    }
+
+    if (selectedCurrency === originCurrency && effectiveRate !== null) {
+      return annualAmountInSelected * effectiveRate;
+    }
+
+    console.warn(`Cannot calculate equivalent in ${targetCurrency} for ${selectedCurrency}. Missing rate or fallback logic.`);
+    return null;
+  }, [amount, frequency, selectedCurrency, originCurrency, targetCurrency, effectiveRate]);
+
 
   return (
-    <div className="grid grid-cols-1 md:grid-cols-5 gap-3 items-center mb-3 p-3 border rounded bg-base-200/50">
-      {/* Type Input */}
+    <div className="grid grid-cols-1 md:grid-cols-6 gap-3 items-end mb-3 p-3 border rounded bg-base-200/50 relative">
       <div className="form-control">
         <label className="label py-1">
           <span className="label-text text-xs">Type</span>
@@ -64,7 +106,6 @@ const PassiveIncomeItem: React.FC<PassiveIncomeItemProps> = ({
         />
       </div>
 
-      {/* Amount Input */}
       <div className="form-control">
          <label className="label py-1">
           <span className="label-text text-xs">Amount</span>
@@ -79,7 +120,6 @@ const PassiveIncomeItem: React.FC<PassiveIncomeItemProps> = ({
         />
       </div>
 
-      {/* Frequency Select */}
       <div className="form-control">
         <label className="label py-1">
           <span className="label-text text-xs">Frequency</span>
@@ -95,25 +135,26 @@ const PassiveIncomeItem: React.FC<PassiveIncomeItemProps> = ({
         </select>
       </div>
 
-      {/* Currency Select */}
       <div className="form-control">
          <label className="label py-1">
           <span className="label-text text-xs">Currency</span>
         </label>
         <select 
           className="select select-sm select-bordered w-full" 
-          value={currency}
-          onChange={(e) => setCurrency(e.target.value)}
-          disabled={currencyLoading || !rates}
+          value={selectedCurrency}
+          onChange={(e) => setSelectedCurrency(e.target.value)}
+          disabled={currencyLoading || (!originCurrency && !targetCurrency)}
         >
-          <option value="" disabled>{currencyLoading ? 'Loading...' : 'Select'}</option>
-          {rates && Object.keys(rates).sort().map((code) => (
-            <option key={code} value={code}>{code}</option>
-          ))}
+          {originCurrency && <option key={`origin-${originCurrency}`} value={originCurrency}>{originCurrency}</option>}
+          {targetCurrency && originCurrency !== targetCurrency && <option key={`target-${targetCurrency}`} value={targetCurrency}>{targetCurrency}</option>}
+          {selectedCurrency && selectedCurrency !== originCurrency && selectedCurrency !== targetCurrency && 
+             <option key={`selected-${selectedCurrency}`} value={selectedCurrency}>{selectedCurrency}</option>}
+          
+          {currencyLoading && <option value="" disabled>Loading...</option>} 
+          {!currencyLoading && !originCurrency && !targetCurrency && <option value="" disabled>Set Countries</option>}
         </select>
       </div>
 
-      {/* Source Country Input */}
       <div className="form-control">
         <label className="label py-1">
           <span className="label-text text-xs">Source Country</span>
@@ -129,17 +170,21 @@ const PassiveIncomeItem: React.FC<PassiveIncomeItemProps> = ({
         />
       </div>
 
-      {/* Remove Button */}
-      <div className="form-control justify-end pt-5"> {/* Adjust alignment as needed */} 
+      <div className="form-control items-center">
         <button 
           className="btn btn-xs btn-ghost text-error" 
           onClick={() => onRemove(item.id)}
           aria-label="Remove passive income item"
         >
-          {/* Simple text remove, could be an icon */}
           Remove
         </button>
       </div>
+      
+      {annualEquivalentInDestination !== null && (
+        <div className="col-span-full text-right text-xs text-gray-500 -mt-2 mr-1 mb-1">
+          <span>≈ Annual {formatSingleCurrency(annualEquivalentInDestination, targetCurrency)}</span>
+        </div>
+      )}
     </div>
   );
 };

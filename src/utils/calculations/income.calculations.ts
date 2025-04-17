@@ -29,6 +29,8 @@ interface NormalizedIncomeStream {
  * @param {string} baseCurrency - The target currency for all amounts (e.g., 'EUR').
  * @param {string} originCountryCode - The user's origin country code (e.g., 'GB').
  * @param {string} destinationCountryCode - The user's destination country code (e.g., 'PT').
+ * @param {string} originCurrencyCode - The currency code of the origin country (e.g., 'GBP').
+ * @param {number | null} effectiveOriginToDestinationRate - The potentially simulated rate for conversion.
  * @returns {NormalizedIncomeStream[]} An array of normalized income streams.
  */
 function adaptIncomeStateToStreams(
@@ -36,7 +38,9 @@ function adaptIncomeStateToStreams(
   exchangeRates: { [currencyCode: string]: number } | null | undefined,
   baseCurrency: string,
   originCountryCode: string,
-  destinationCountryCode: string
+  destinationCountryCode: string,
+  originCurrencyCode: string,
+  effectiveOriginToDestinationRate: number | null
 ): NormalizedIncomeStream[] {
   const streams: NormalizedIncomeStream[] = [];
   // const { exchangeRates } = incomeState; // Removed: Rates are passed in
@@ -46,13 +50,28 @@ function adaptIncomeStateToStreams(
       if (currency === baseCurrency) {
           return amount;
       }
+      
+      // --- FX Simulation Logic --- 
+      // Check if we are converting FROM the origin currency TO the base (destination) currency
+      // AND if an effective rate (potentially simulated) is provided.
+      if (currency === originCurrencyCode && effectiveOriginToDestinationRate !== null) {
+          console.log(`Using effective rate (${effectiveOriginToDestinationRate}) for ${currency} -> ${baseCurrency}`);
+          // We assume the effective rate is Origin -> Destination (Base)
+          // e.g., 1 Origin = X Destination
+          return amount * effectiveOriginToDestinationRate;
+      }
+      // --- End FX Simulation Logic ---
+
+      // Fallback to using the general exchange rates for other conversions
       const rate = exchangeRates?.[currency];
       if (rate && rate !== 0) {
           // Assuming rates are FROM base currency TO foreign currency
           // So, foreign amount / rate = base amount
+          console.log(`Using standard rate (${rate}) for ${currency} -> ${baseCurrency}`);
           return amount / rate;
       }
-      console.warn(`Missing or invalid exchange rate for ${currency} to ${baseCurrency}. Cannot convert.`);
+
+      console.warn(`Missing or invalid exchange rate for ${currency} to ${baseCurrency}. Cannot convert using standard rates.`);
       return 0; // Or handle error appropriately
   };
 
@@ -143,25 +162,31 @@ function adaptIncomeStateToStreams(
  * @param {string} profileSettings.destinationCountry - e.g., 'PT'
  * @param {string} profileSettings.originCountry - e.g., 'GB'
  * @param {boolean} profileSettings.isNHRActive - Flag indicating if NHR regime is selected.
- * @param {{ [currencyCode: string]: number } | null | undefined} exchangeRates - Exchange rates object.
- * @param {string} baseCurrency - The base currency for calculations (e.g., 'EUR').
+ * @param {{ [currencyCode: string]: number } | null | undefined} exchangeRates - Exchange rates object (relative to context's baseCurrency).
+ * @param {string} baseCurrency - The base currency for calculations (should be destination currency, e.g., 'EUR').
+ * @param {string} originCurrency - The origin currency code (e.g., 'GBP').
+ * @param {number | null} effectiveRate - The potentially simulated rate for origin -> destination conversion.
  * @returns {number} Total estimated annual net income in the base currency.
  */
 export const calculateTotalAnnualNetIncome = (
     incomeState: Income,
     profileSettings: { destinationCountry: string; originCountry: string; isNHRActive: boolean },
     exchangeRates: { [currencyCode: string]: number } | null | undefined,
-    baseCurrency: string
+    baseCurrency: string,
+    originCurrency: string,
+    effectiveRate: number | null
 ): number => {
     const { destinationCountry, originCountry, isNHRActive } = profileSettings;
 
-    // Adapt income state to normalized streams
+    // Adapt income state to normalized streams, passing the effective rate
     const incomeStreams = adaptIncomeStateToStreams(
         incomeState,
         exchangeRates,
         baseCurrency,
         originCountry,
-        destinationCountry
+        destinationCountry,
+        originCurrency,
+        effectiveRate
     );
 
     let totalAnnualNet = 0;
@@ -203,15 +228,26 @@ export const calculateTotalAnnualNetIncome = (
  * @param {object} profileSettings
  * @param {{ [currencyCode: string]: number } | null | undefined} exchangeRates
  * @param {string} baseCurrency
+ * @param {string} originCurrency - The origin currency code (e.g., 'GBP').
+ * @param {number | null} effectiveRate - The potentially simulated rate for origin -> destination conversion.
  * @returns {number} Total estimated monthly net income in the base currency.
  */
 export const calculateTotalMonthlyNetIncome = (
     incomeState: Income,
     profileSettings: { destinationCountry: string; originCountry: string; isNHRActive: boolean },
     exchangeRates: { [currencyCode: string]: number } | null | undefined,
-    baseCurrency: string
+    baseCurrency: string,
+    originCurrency: string,
+    effectiveRate: number | null
 ): number => {
-    const annualNet = calculateTotalAnnualNetIncome(incomeState, profileSettings, exchangeRates, baseCurrency);
+    const annualNet = calculateTotalAnnualNetIncome(
+        incomeState, 
+        profileSettings, 
+        exchangeRates, 
+        baseCurrency,
+        originCurrency,
+        effectiveRate
+    );
     return annualNet / MONTHS_PER_YEAR;
 };
 
@@ -224,7 +260,7 @@ export const calculateTotalAnnualGrossIncome = (
 ): number => {
     // Adapt income state to normalized streams just to sum amounts easily
     // (Ignoring origin/destination for gross calc)
-    const incomeStreams = adaptIncomeStateToStreams(incomeState, exchangeRates, baseCurrency, '', '');
+    const incomeStreams = adaptIncomeStateToStreams(incomeState, exchangeRates, baseCurrency, '', '', '', null);
     let totalGross = 0;
     incomeStreams.forEach(stream => totalGross += stream.amount);
      console.warn('calculateTotalAnnualGrossIncome sums adapted streams, check consistency.');

@@ -2,6 +2,8 @@
 
 import React, { useMemo } from 'react';
 import { formatNumberInput, parseFormattedNumber } from '@/utils/transformations/financial.transformations';
+import { useCurrency } from '@/context/CurrencyContext'; // Import context hook
+import { formatDualCurrency } from '@/utils/formatting'; // Import formatter
 
 // Define types consistent with page.tsx
 const ageGroups = [
@@ -21,7 +23,6 @@ interface EducationProps {
   household: HouseholdComposition;
   educationState: EducationState;
   onEducationChange: (childKey: string, details: Partial<EducationDetails>) => void;
-  currencySymbol?: string; // Optional currency symbol
 }
 
 const relevantAgeGroups: AgeGroup[] = ['Primary', 'Secondary', 'College'];
@@ -30,8 +31,30 @@ const Education: React.FC<EducationProps> = ({
   household,
   educationState,
   onEducationChange,
-  currencySymbol = '€', // Default to Euro
 }) => {
+  const { originCurrency, targetCurrency, effectiveRate } = useCurrency(); // Get currency context
+
+  // Helper to render dual currency format
+  const renderDualCurrency = (amount: number | null | '') => {
+    const numericAmount = Number(amount);
+    if (amount === null || amount === '' || isNaN(numericAmount) || !targetCurrency || !originCurrency || !effectiveRate) return 'N/A';
+
+    const formatted = formatDualCurrency(numericAmount, targetCurrency, originCurrency, effectiveRate);
+    return (
+      <>
+        <span className="font-bold">{formatted.destination}</span>
+        <span className="text-sm font-normal"> / {formatted.origin}</span>
+      </>
+    );
+  };
+
+  // Helper to display origin currency equivalent below inputs
+  const showOriginEquivalent = (amount: number | '') => {
+     const numericAmount = Number(amount);
+     if (amount === null || amount === '' || isNaN(numericAmount) || !targetCurrency || !originCurrency || !effectiveRate || numericAmount <= 0) return null;
+     const formatted = formatDualCurrency(numericAmount, targetCurrency, originCurrency, effectiveRate);
+     return `≈ ${formatted.origin}`;
+  };
 
   const handleInputChange = (
     childKey: string,
@@ -75,6 +98,8 @@ const Education: React.FC<EducationProps> = ({
         const currentDetails = educationState[childKey] || { choice: 'public' }; // Default to public
         const currentChoice = currentDetails.choice;
         const costs = educationCosts.childCosts[childKey];
+        const tuitionOriginEquiv = showOriginEquivalent(currentDetails.annualTuition ?? '');
+        const extrasOriginEquiv = showOriginEquivalent(currentDetails.extraCosts ?? '');
 
         elements.push(
           <div key={childKey} className="mb-4 p-3 border rounded-md bg-base-200/30">
@@ -102,7 +127,7 @@ const Education: React.FC<EducationProps> = ({
                 {/* Annual Tuition */}
                 <div className="form-control w-full max-w-xs">
                   <label className="label">
-                    <span className="label-text">Annual Tuition ({currencySymbol})</span>
+                    <span className="label-text">Annual Tuition ({targetCurrency})</span>
                   </label>
                   <input
                     type="text" // Use text for formatted input
@@ -112,12 +137,17 @@ const Education: React.FC<EducationProps> = ({
                     onChange={(e) => handleInputChange(childKey, 'annualTuition', e.target.value)}
                     inputMode="decimal" // Hint for mobile keyboards
                   />
+                  {tuitionOriginEquiv && (
+                    <div className="text-xs text-gray-500 mt-1 text-right pr-1">
+                      {tuitionOriginEquiv} / yr
+                    </div>
+                   )}
                 </div>
 
                 {/* Extra Costs */}
                 <div className="form-control w-full max-w-xs">
                   <label className="label">
-                    <span className="label-text">Annual Extra Costs ({currencySymbol})</span>
+                    <span className="label-text">Annual Extra Costs ({targetCurrency})</span>
                     <span className="label-text-alt">(Books, Uniforms, Activities)</span>
                   </label>
                   <input
@@ -128,12 +158,17 @@ const Education: React.FC<EducationProps> = ({
                     onChange={(e) => handleInputChange(childKey, 'extraCosts', e.target.value)}
                     inputMode="decimal"
                   />
+                   {extrasOriginEquiv && (
+                    <div className="text-xs text-gray-500 mt-1 text-right pr-1">
+                      {extrasOriginEquiv} / yr
+                    </div>
+                   )}
                 </div>
 
-                {/* Display Per-Child Monthly Cost */}
+                {/* Display Per-Child Monthly Cost - Apply formatting */}
                 {costs && (
-                  <div className="mt-2 text-sm text-right font-medium">
-                    Monthly Cost: {currencySymbol}{costs.monthly.toFixed(2)}
+                  <div className="mt-2 text-sm text-right font-medium whitespace-normal">
+                    Avg. Monthly Cost: {renderDualCurrency(costs.monthly)}
                   </div>
                 )}
               </div>
@@ -161,14 +196,14 @@ const Education: React.FC<EducationProps> = ({
           </div>
         )}
 
-        {/* Display Household Totals */}
+        {/* Display Household Totals - Apply formatting */}
         {childInputs.length > 0 && (
           <div className="mt-4 pt-4 border-t border-base-300 text-right">
-            <p className="font-semibold">
-              Total Monthly Education Cost: {currencySymbol}{educationCosts.totalMonthlyCost.toFixed(2)}
+            <p className="font-semibold whitespace-normal">
+              Total Avg. Monthly Education Cost: {renderDualCurrency(educationCosts.totalMonthlyCost)}
             </p>
-            <p className="text-sm text-base-content/80">
-              (Total Annual: {currencySymbol}{educationCosts.totalAnnualCost.toFixed(2)})
+            <p className="text-sm text-base-content/80 whitespace-normal">
+              (Total Annual: {renderDualCurrency(educationCosts.totalAnnualCost)})
             </p>
           </div>
         )}

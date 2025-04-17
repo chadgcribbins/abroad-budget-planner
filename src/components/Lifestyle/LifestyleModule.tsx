@@ -3,6 +3,7 @@
 import React, { useState, useMemo } from 'react';
 import { useLifestyle, HomeServiceName, HomeServiceFrequency } from '@/context/LifestyleContext';
 import { useCurrency } from '@/context/CurrencyContext';
+import { formatDualCurrency } from '@/utils/formatting';
 
 // Helper to convert amounts to monthly frequency for calculation
 const getMonthlyAmount = (amount: number | string, frequency: 'monthly' | 'annual'): number => {
@@ -12,11 +13,42 @@ const getMonthlyAmount = (amount: number | string, frequency: 'monthly' | 'annua
 
 export const LifestyleModule: React.FC = () => {
   const { state, dispatch } = useLifestyle();
-  const { baseCurrency } = useCurrency();
+  const { originCurrency, targetCurrency, effectiveRate } = useCurrency();
+
+  // Helper to render dual currency format
+  const renderDualCurrency = (amount: number | null | '' | undefined) => {
+    const numericAmount = Number(amount);
+    if (amount === null || amount === '' || amount === undefined || isNaN(numericAmount) || !targetCurrency || !originCurrency || !effectiveRate) return 'N/A';
+    const formatted = formatDualCurrency(numericAmount, targetCurrency, originCurrency, effectiveRate);
+    return (
+      <>
+        <span className="font-bold">{formatted.destination}</span>
+        <span className="text-sm font-normal"> / {formatted.origin}</span>
+      </>
+    );
+  };
+
+  // Helper to display origin currency equivalent below inputs
+  const showOriginEquivalent = (amount: string | number | null | '' | undefined, isAnnual: boolean = false) => {
+     // Convert string to number robustly inside the helper
+     const numericAmount = (typeof amount === 'string' && amount !== '') ? parseFloat(amount) : (typeof amount === 'number' ? amount : undefined);
+     
+     // Use numericAmount for checks and formatting
+     if (numericAmount === undefined || isNaN(numericAmount) || !targetCurrency || !originCurrency || !effectiveRate || numericAmount <= 0) return null;
+     
+     const formatted = formatDualCurrency(numericAmount, targetCurrency, originCurrency, effectiveRate);
+     return `≈ ${formatted.origin}${isAnnual ? ' / yr' : ' / mo'}`;
+  };
+
+  // Helper to display origin equivalent for the input based on frequency
+  const showInputOriginEquivalent = (amount: number | string | '' | undefined, frequency: 'monthly' | 'annual') => {
+    // This correctly calls the updated showOriginEquivalent
+    return showOriginEquivalent(amount, frequency === 'annual');
+  }
 
   // Local state for the new purchase form
   const [newPurchaseName, setNewPurchaseName] = useState('');
-  const [newPurchaseAmount, setNewPurchaseAmount] = useState<string | number>('');
+  const [newPurchaseAmount, setNewPurchaseAmount] = useState<number | undefined>(undefined);
 
   const handleGeneralShoppingChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const amount = e.target.value;
@@ -35,15 +67,14 @@ export const LifestyleModule: React.FC = () => {
 
   // Handlers for one-off purchases
   const handleAddOneOffPurchase = () => {
-    const amount = parseFloat(newPurchaseAmount as string);
-    if (newPurchaseName.trim() && !isNaN(amount) && amount > 0) {
+    if (newPurchaseName.trim() && newPurchaseAmount !== undefined && newPurchaseAmount > 0) {
       dispatch({
         type: 'ADD_ONE_OFF_PURCHASE',
-        payload: { name: newPurchaseName.trim(), amount },
+        payload: { name: newPurchaseName.trim(), amount: newPurchaseAmount },
       });
       // Reset form
       setNewPurchaseName('');
-      setNewPurchaseAmount('');
+      setNewPurchaseAmount(undefined);
     } else {
       // Basic validation feedback (could be improved)
       alert('Please enter a valid name and positive amount for the purchase.');
@@ -146,10 +177,11 @@ export const LifestyleModule: React.FC = () => {
   // Helper to render a single home service input row
   const renderHomeServiceInput = (serviceName: HomeServiceName, label: string) => {
     const serviceState = state.homeServices[serviceName];
+    const originEquiv = showInputOriginEquivalent(serviceState.amount, serviceState.frequency);
     return (
       <div className="form-control w-full mb-4" key={serviceName}>
         <label className="label">
-          <span className="label-text">{label}</span>
+          <span className="label-text">{label} ({targetCurrency})</span>
         </label>
         <div className="join">
           <input
@@ -173,9 +205,11 @@ export const LifestyleModule: React.FC = () => {
             Annual
           </button>
         </div>
-        <label className="label">
-          <span className="label-text-alt">Input as {baseCurrency} {serviceState.amount || 0} per {serviceState.frequency}</span>
-        </label>
+        {originEquiv && (
+          <label className="label">
+            <span className="label-text-alt">{originEquiv}</span>
+          </label>
+        )}
       </div>
     );
   };
@@ -188,7 +222,8 @@ export const LifestyleModule: React.FC = () => {
         {/* General Shopping Spend */}
         <div className="form-control w-full mb-4">
           <label className="label">
-            <span className="label-text">General Shopping Spend (Groceries, clothing, hobbies, gifts, etc.)</span>
+            <span className="label-text">General Shopping Spend ({targetCurrency})</span>
+            <span className="label-text-alt">(Groceries, clothing, hobbies, etc.)</span>
           </label>
           <div className="join">
             <input
@@ -212,13 +247,17 @@ export const LifestyleModule: React.FC = () => {
               Annual
             </button>
           </div>
-          <label className="label">
-            <span className="label-text-alt">Input as {baseCurrency} {state.generalShoppingSpend.amount || 0} per {state.generalShoppingSpend.frequency}</span>
-          </label>
+          {showInputOriginEquivalent(state.generalShoppingSpend.amount, state.generalShoppingSpend.frequency) && (
+            <label className="label">
+              <span className="label-text-alt">
+                {showInputOriginEquivalent(state.generalShoppingSpend.amount, state.generalShoppingSpend.frequency)}
+              </span>
+            </label>
+          )}
         </div>
         
         {/* --- One-Off Big Purchases --- */}
-        <div className="divider">One-Off Big Purchases</div>
+        <div className="divider">One-Off Big Purchases ({targetCurrency})</div>
 
         {/* Add New Purchase Form */}
         <div className="flex flex-col sm:flex-row gap-2 mb-4">
@@ -229,14 +268,26 @@ export const LifestyleModule: React.FC = () => {
             value={newPurchaseName}
             onChange={(e) => setNewPurchaseName(e.target.value)}
           />
-          <input
-            type="number"
-            placeholder="Amount"
-            className="input input-bordered w-full sm:w-32"
-            value={newPurchaseAmount}
-            onChange={(e) => setNewPurchaseAmount(e.target.value)}
-            min="0"
-          />
+          <div className="form-control">
+              <input
+                type="number"
+                placeholder="Amount"
+                className="input input-bordered w-full sm:w-32"
+                value={newPurchaseAmount?.toString() ?? ''}
+                onChange={(e) => {
+                    const valStr = e.target.value;
+                    const num = valStr === '' ? undefined : parseFloat(valStr);
+                    setNewPurchaseAmount(isNaN(num as number) ? undefined : num); 
+                }}
+                min="0"
+              />
+               {/* Call helper directly with number | undefined state */} 
+               {showOriginEquivalent(newPurchaseAmount, true) && (
+                 <div className="text-xs text-gray-500 mt-1 text-right pr-1">
+                    {showOriginEquivalent(newPurchaseAmount, true)}
+                 </div>
+               )}
+          </div>
           <button 
             className="btn btn-secondary"
             onClick={handleAddOneOffPurchase}
@@ -248,27 +299,29 @@ export const LifestyleModule: React.FC = () => {
         {/* List of Purchases */}
         {state.oneOffPurchases.length > 0 && (
           <div className="overflow-x-auto mb-4">
-            <table className="table table-zebra table-sm">
+            <table className="table table-zebra table-sm w-full">
               <thead>
                 <tr>
                   <th>Name</th>
-                  <th>Amount ({baseCurrency})</th>
+                  <th>Amount ({targetCurrency}/yr)</th>
+                  <th>Equivalent ({originCurrency}/yr)</th>
                   <th>Action</th>
                 </tr>
               </thead>
               <tbody>
-                {state.oneOffPurchases.map((purchase) => (
-                  <tr key={purchase.id}>
-                    <td>{purchase.name}</td>
-                    <td>{typeof purchase.amount === 'number' ? purchase.amount.toLocaleString() : purchase.amount}</td>
+                {state.oneOffPurchases.map((item) => (
+                  <tr key={item.id}>
+                    <td>{item.name}</td>
+                    {/* Ensure item.amount is treated as number */}
+                    <td>{(Number(item.amount) || 0).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</td>
+                    <td>{formatDualCurrency(Number(item.amount) || 0, targetCurrency ?? '', originCurrency ?? '', effectiveRate).origin || '---'}</td>
                     <td>
                       <button 
                         className="btn btn-xs btn-error btn-outline"
-                        onClick={() => handleRemoveOneOffPurchase(purchase.id)}
+                        onClick={() => handleRemoveOneOffPurchase(item.id)}
                       >
                         Remove
                       </button>
-                      {/* Add Edit button later if needed */}
                     </td>
                   </tr>
                 ))}
@@ -276,15 +329,12 @@ export const LifestyleModule: React.FC = () => {
             </table>
           </div>
         )}
-        {state.oneOffPurchases.length === 0 && (
-           <p className="text-sm text-gray-500 italic mb-4">No one-off purchases added yet.</p>
-        )}
-        
+
         {/* --- Travel & Holidays --- */}
         <div className="divider">Travel & Holidays</div>
         <div className="form-control w-full mb-4">
           <label className="label">
-            <span className="label-text">Annual Travel & Holidays Budget</span>
+            <span className="label-text">Travel Budget ({targetCurrency})</span>
           </label>
           <div className="join">
             <input
@@ -308,80 +358,75 @@ export const LifestyleModule: React.FC = () => {
               Annual
             </button>
           </div>
-          <label className="label">
-            <span className="label-text-alt">Input as {baseCurrency} {state.travelHolidaysBudget.amount || 0} per {state.travelHolidaysBudget.frequency}</span>
-          </label>
+           {showInputOriginEquivalent(state.travelHolidaysBudget.amount, state.travelHolidaysBudget.frequency) && (
+            <label className="label">
+              <span className="label-text-alt">
+                {showInputOriginEquivalent(state.travelHolidaysBudget.amount, state.travelHolidaysBudget.frequency)}
+              </span>
+            </label>
+          )}
         </div>
-        
+
         {/* --- Home Services --- */}
         <div className="divider">Home Services</div>
         {renderHomeServiceInput('cleaner', 'Cleaner')}
-        {renderHomeServiceInput('babysitter', 'Babysitter / Childcare')}
-        {renderHomeServiceInput('gardening', 'Gardening')}
-        {renderHomeServiceInput('petCare', 'Pet Care')}
-        
-        {/* --- Contingency / Unknowns --- */}
+        {renderHomeServiceInput('babysitter', 'Babysitter / Nanny')}
+        {renderHomeServiceInput('gardening', 'Gardener')}
+        {renderHomeServiceInput('petCare', 'Pet Care / Walker')}
+
+        {/* --- Contingency --- */}
         <div className="divider">Contingency / Unknowns</div>
-        
         <div className="form-control w-full mb-4">
           <label className="label">
             <span className="label-text">Contingency Type</span>
           </label>
           <div className="join mb-2">
             <button
-              className={`btn join-item ${state.contingency.type === 'percentage' ? 'btn-active' : ''}`}
-              onClick={() => handleContingencyTypeChange('percentage')}
-            >
-              Percentage (%)
-            </button>
-            <button
               className={`btn join-item ${state.contingency.type === 'fixed' ? 'btn-active' : ''}`}
               onClick={() => handleContingencyTypeChange('fixed')}
             >
-              Fixed Amount
+              Fixed Amount ({targetCurrency})
+            </button>
+            <button
+              className={`btn join-item ${state.contingency.type === 'percentage' ? 'btn-active' : ''}`}
+              onClick={() => handleContingencyTypeChange('percentage')}
+            >
+              Percentage (% of Base)
             </button>
           </div>
+          <div className="form-control">
+            <input
+              type="number"
+              placeholder={state.contingency.type === 'fixed' ? "Amount" : "Percentage"}
+              className="input input-bordered w-full max-w-xs"
+              value={state.contingency.value}
+              onChange={handleContingencyValueChange}
+              min="0"
+              step={state.contingency.type === 'fixed' ? "any" : "1"}
+            />
+            {state.contingency.type === 'fixed' && showOriginEquivalent(state.contingency.value) && (
+                <div className="text-xs text-gray-500 mt-1 text-right pr-1 w-full max-w-xs">
+                    {showOriginEquivalent(state.contingency.value)}
+                </div>
+            )}
+          </div>
+          {/* Display calculated contingency amount */}
+          <div className="mt-2 text-sm text-right font-medium whitespace-normal">
+             Contingency Added: {renderDualCurrency(finalContingencyAmount)}
+          </div>
+        </div>
 
-          {state.contingency.type === 'percentage' && (
-            <div className="form-control w-full">
-              <label className="label">
-                <span className="label-text">Percentage of Monthly Lifestyle Costs</span>
-              </label>
-              <input
-                type="number"
-                placeholder="Percentage (e.g., 10)"
-                className="input input-bordered w-full"
-                value={state.contingency.value}
-                onChange={handleContingencyValueChange}
-                min="0"
-                max="100"
-                step="0.1"
-              />
-              <label className="label">
-                <span className="label-text-alt">Base Monthly Cost: {baseCurrency} {baseMonthlyLifestyleCost.toFixed(2)}</span>
-                <span className="label-text-alt">Contingency: {baseCurrency} {finalContingencyAmount.toFixed(2)}</span>
-              </label>
-            </div>
-          )}
-
-          {state.contingency.type === 'fixed' && (
-             <div className="form-control w-full">
-              <label className="label">
-                <span className="label-text">Fixed Monthly Contingency Amount</span>
-              </label>
-              <input
-                type="number"
-                placeholder="Amount"
-                className="input input-bordered w-full"
-                value={state.contingency.value}
-                onChange={handleContingencyValueChange}
-                min="0"
-              />
-              <label className="label">
-                <span className="label-text-alt">Contingency: {baseCurrency} {finalContingencyAmount.toFixed(2)}</span>
-              </label>
-            </div>
-          )}
+        {/* --- Total Lifestyle Cost --- */}
+        <div className="mt-6 pt-4 border-t border-base-300 text-right">
+          <p className="font-semibold whitespace-normal">
+            Total Avg. Monthly Lifestyle Cost (incl. Contingency):
+            <span className="block text-xl">
+              {renderDualCurrency(baseMonthlyLifestyleCost + finalContingencyAmount)}
+            </span>
+          </p>
+          <p className="text-sm text-base-content/80 whitespace-normal">
+            (Base Monthly: {renderDualCurrency(baseMonthlyLifestyleCost)} + Contingency: {renderDualCurrency(finalContingencyAmount)})
+          </p>
         </div>
 
       </div>

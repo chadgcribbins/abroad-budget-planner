@@ -575,7 +575,7 @@
       "id": 14,
       "title": "Develop Healthcare Module",
       "description": "Create the healthcare section with coverage type and cost inputs.",
-      "status": "pending",
+      "status": "done",
       "dependencies": [
         4,
         6
@@ -699,7 +699,7 @@
       "id": 16,
       "title": "Implement FX Sensitivity Module",
       "description": "Create the foreign exchange sensitivity analysis tools.",
-      "status": "pending",
+      "status": "done",
       "dependencies": [
         3,
         8
@@ -714,7 +714,7 @@
           "description": "Develop a service to fetch and manage foreign exchange rates from an external API, with caching capabilities and error handling.",
           "dependencies": [],
           "details": "Implementation details:\n1. Create a service class that handles API calls to fetch current exchange rates\n2. Implement caching mechanism to store rates for configurable time periods\n3. Add error handling for API failures with fallback to cached values\n4. Create methods to convert between currencies using the fetched rates\n5. Add logging for rate updates and conversion operations\n6. Testing approach: Write unit tests with mocked API responses, test caching behavior, and verify conversion calculations",
-          "status": "pending",
+          "status": "done",
           "parentTaskId": 16
         },
         {
@@ -725,7 +725,7 @@
             1
           ],
           "details": "Implementation details:\n1. Design a UI component showing current exchange rates from the API service\n2. Add input fields for manual rate overrides with validation\n3. Implement toggle switches to enable/disable specific rate overrides\n4. Create visual indicators showing which rates are using API values vs overrides\n5. Add reset functionality to revert to API values\n6. Testing approach: Create component tests verifying UI rendering, input validation, and proper state management for overrides",
-          "status": "pending",
+          "status": "done",
           "parentTaskId": 16
         },
         {
@@ -737,7 +737,7 @@
             2
           ],
           "details": "Implementation details:\n1. Create slider components with appropriate ranges for FX movement simulation\n2. Add percentage input fields synchronized with slider positions\n3. Implement bidirectional binding between sliders and input fields\n4. Add presets for common shock scenarios (e.g., 5%, 10%, 15% movements)\n5. Create a reset button to return all simulations to baseline\n6. Testing approach: Test slider-input synchronization, boundary values, and preset functionality through component tests",
-          "status": "pending",
+          "status": "done",
           "parentTaskId": 16
         },
         {
@@ -749,7 +749,7 @@
             3
           ],
           "details": "Implementation details:\n1. Develop algorithms to recalculate budget values based on exchange rate changes\n2. Create a calculation pipeline that processes all budget items with the simulated rates\n3. Implement delta calculations to show differences between baseline and simulated scenarios\n4. Add percentage and absolute change calculations for key metrics\n5. Optimize for performance with large datasets\n6. Testing approach: Write comprehensive unit tests with various exchange rate scenarios, verify calculations against manually verified examples",
-          "status": "pending",
+          "status": "done",
           "parentTaskId": 16
         },
         {
@@ -760,7 +760,7 @@
             4
           ],
           "details": "Implementation details:\n1. Design and implement bar/column charts showing before/after values for key budget items\n2. Create heat maps highlighting areas most sensitive to FX changes\n3. Develop waterfall charts showing cumulative impact across categories\n4. Add interactive tooltips with detailed information on hover\n5. Implement export functionality for visualizations\n6. Testing approach: Test chart rendering with various data scenarios, verify tooltip content, and test responsiveness across screen sizes",
-          "status": "pending",
+          "status": "done",
           "parentTaskId": 16
         },
         {
@@ -773,7 +773,7 @@
             4
           ],
           "details": "Implementation details:\n1. Create a dual-currency display component that can be reused across the application\n2. Modify existing budget display components to incorporate the dual-currency view\n3. Add configuration options for users to select which currencies to display\n4. Implement visual indicators showing which values are affected by overrides or simulations\n5. Ensure consistent formatting and alignment of dual-currency values\n6. Testing approach: Create integration tests verifying dual-currency display across different application modules, test with various override and simulation scenarios",
-          "status": "pending",
+          "status": "done",
           "parentTaskId": 16
         }
       ]

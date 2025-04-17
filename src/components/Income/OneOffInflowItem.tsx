@@ -1,8 +1,9 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { OneOffInflow } from '../../types/income.types';
 import { useCurrency } from '../../context/CurrencyContext';
+import { formatSingleCurrency } from '@/utils/formatting';
 
 interface OneOffInflowItemProps {
   item: OneOffInflow;
@@ -13,42 +14,77 @@ interface OneOffInflowItemProps {
 const OneOffInflowItem: React.FC<OneOffInflowItemProps> = ({ 
     item, 
     onUpdate, 
-    onRemove 
+    onRemove, 
 }) => {
-  const { rates, isLoading: currencyLoading } = useCurrency();
+  const {
+    isLoading: currencyLoading,
+    originCurrency,
+    targetCurrency,
+    effectiveRate
+  } = useCurrency();
 
-  // Internal state for editing
   const [description, setDescription] = useState<string>(item.description);
   const [amount, setAmount] = useState<string>(item.amount.toString());
-  const [currency, setCurrency] = useState<string>(item.currency);
-  const [year, setYear] = useState<string>(item.year?.toString() || ''); // Optional year
+  const [selectedCurrency, setSelectedCurrency] = useState<string>(item.currency || originCurrency || '');
+  const [year, setYear] = useState<string>(item.year?.toString() || '');
   const [sourceCountry, setSourceCountry] = useState<string>(item.sourceCountry || '');
 
-  // Effect to call onUpdate when internal state changes and is valid
+  useEffect(() => {
+    setDescription(item.description);
+    setAmount(item.amount.toString());
+    setSelectedCurrency(item.currency || originCurrency || '');
+    setYear(item.year?.toString() || '');
+    setSourceCountry(item.sourceCountry || '');
+  }, [item, originCurrency]);
+
   useEffect(() => {
     const numericAmount = parseFloat(amount);
     const numericYear = year ? parseInt(year, 10) : undefined;
     
-    if (!isNaN(numericAmount) && numericAmount >= 0 && description && currency) {
+    if (!isNaN(numericAmount) && numericAmount >= 0 && description && selectedCurrency) {
       const updatedItem: OneOffInflow = {
         id: item.id,
         description,
         amount: numericAmount,
-        currency,
-        year: numericYear,
+        currency: selectedCurrency,
+        year: (numericYear && !isNaN(numericYear)) ? numericYear : undefined,
         sourceCountry: sourceCountry || undefined,
       };
-      if (JSON.stringify(updatedItem) !== JSON.stringify(item)) {
+       if (
+          updatedItem.description !== item.description ||
+          updatedItem.amount !== item.amount ||
+          updatedItem.currency !== item.currency ||
+          updatedItem.year !== item.year ||
+          updatedItem.sourceCountry !== item.sourceCountry
+      ) {
         onUpdate(updatedItem);
       }
     }
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [description, amount, currency, year, sourceCountry, item.id]);
+  }, [description, amount, selectedCurrency, year, sourceCountry, item.id]);
+
+  const equivalentInDestination = useMemo(() => {
+    const numericAmount = parseFloat(amount);
+    if (isNaN(numericAmount) || !selectedCurrency || !targetCurrency) {
+      return null;
+    }
+
+    if (selectedCurrency === targetCurrency) {
+      return numericAmount;
+    }
+
+    if (selectedCurrency === originCurrency && effectiveRate !== null) {
+      return numericAmount * effectiveRate;
+    }
+
+    console.warn(`Cannot calculate equivalent in ${targetCurrency} for ${selectedCurrency}. Missing rate or fallback logic.`);
+    return null;
+  }, [amount, selectedCurrency, originCurrency, targetCurrency, effectiveRate]);
+
 
   return (
-    <div className="grid grid-cols-1 md:grid-cols-5 gap-3 items-center mb-3 p-3 border rounded bg-base-200/50">
-      {/* Description Input */}
-      <div className="form-control md:col-span-2"> {/* Spanning 2 columns */} 
+    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-3 items-end mb-3 p-3 border rounded bg-base-200/50 relative">
+      <div className="form-control lg:col-span-2"> 
         <label className="label py-1">
           <span className="label-text text-xs">Description</span>
         </label>
@@ -61,7 +97,6 @@ const OneOffInflowItem: React.FC<OneOffInflowItemProps> = ({
         />
       </div>
 
-      {/* Amount Input */}
       <div className="form-control">
          <label className="label py-1">
           <span className="label-text text-xs">Amount</span>
@@ -76,27 +111,43 @@ const OneOffInflowItem: React.FC<OneOffInflowItemProps> = ({
         />
       </div>
 
-      {/* Currency Select */}
       <div className="form-control">
          <label className="label py-1">
           <span className="label-text text-xs">Currency</span>
         </label>
         <select 
           className="select select-sm select-bordered w-full" 
-          value={currency}
-          onChange={(e) => setCurrency(e.target.value)}
-          disabled={currencyLoading || !rates}
+          value={selectedCurrency}
+          onChange={(e) => setSelectedCurrency(e.target.value)}
+          disabled={currencyLoading || (!originCurrency && !targetCurrency)}
         >
-          <option value="" disabled>{currencyLoading ? 'Loading...' : 'Select'}</option>
-          {rates && Object.keys(rates).sort().map((code) => (
-            <option key={code} value={code}>{code}</option>
-          ))}
+           {originCurrency && <option key={`origin-${originCurrency}`} value={originCurrency}>{originCurrency}</option>}
+           {targetCurrency && originCurrency !== targetCurrency && <option key={`target-${targetCurrency}`} value={targetCurrency}>{targetCurrency}</option>}
+           {selectedCurrency && selectedCurrency !== originCurrency && selectedCurrency !== targetCurrency && 
+              <option key={`selected-${selectedCurrency}`} value={selectedCurrency}>{selectedCurrency}</option>}
+           
+          {currencyLoading && <option value="" disabled>Loading...</option>} 
+          {!currencyLoading && !originCurrency && !targetCurrency && <option value="" disabled>Set Countries</option>}
         </select>
       </div>
       
-       {/* Year Input & Remove Button */} 
-      <div className="flex items-end gap-2">
-          <div className="form-control grow">
+      <div className="form-control"> 
+         <label className="label py-1">
+          <span className="label-text text-xs">Source Country</span>
+        </label>
+        <input 
+          type="text" 
+          placeholder="e.g., UK"
+          className="input input-sm input-bordered w-full" 
+          value={sourceCountry}
+          onChange={(e) => setSourceCountry(e.target.value.toUpperCase())}
+          maxLength={3}
+          title="Country where this inflow originates (e.g., PT, UK, US). Needed for NHR tax calculation."
+        />
+      </div>
+
+      <div className="form-control flex flex-row items-end gap-2">
+          <div className="grow">
             <label className="label py-1">
                 <span className="label-text text-xs">Year (Optional)</span>
             </label>
@@ -111,7 +162,7 @@ const OneOffInflowItem: React.FC<OneOffInflowItemProps> = ({
             />
           </div>
           <button
-               className="btn btn-sm btn-ghost text-error mb-1"
+               className="btn btn-xs btn-ghost text-error mb-1"
                onClick={() => onRemove(item.id)}
                aria-label="Remove one-off inflow item"
             >
@@ -119,21 +170,11 @@ const OneOffInflowItem: React.FC<OneOffInflowItemProps> = ({
             </button>
       </div>
 
-      {/* Source Country Input (Added) */}
-      <div className="form-control md:col-start-4"> {/* Align under Currency */} 
-         <label className="label py-1">
-          <span className="label-text text-xs">Source Country</span>
-        </label>
-        <input 
-          type="text" 
-          placeholder="e.g., UK"
-          className="input input-sm input-bordered w-full" 
-          value={sourceCountry}
-          onChange={(e) => setSourceCountry(e.target.value.toUpperCase())}
-          maxLength={3}
-          title="Country where this inflow originates (e.g., PT, UK, US). Needed for NHR tax calculation."
-        />
-      </div>
+       {equivalentInDestination !== null && (
+        <div className="col-span-full text-right text-xs text-gray-500 -mt-2 mr-1 mb-1">
+          <span>≈ {formatSingleCurrency(equivalentInDestination, targetCurrency)}</span>
+        </div>
+      )}
 
     </div>
   );

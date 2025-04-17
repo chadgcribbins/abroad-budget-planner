@@ -1,4 +1,6 @@
 import React from 'react';
+import { useCurrency } from '@/context/CurrencyContext'; // Import context hook
+import { formatDualCurrency } from '@/utils/formatting'; // Import formatter
 
 // Define the props for the Utilities component
 type UtilitiesProps = {
@@ -43,6 +45,29 @@ const Utilities: React.FC<UtilitiesProps> = ({
   mobile,
   onUtilitiesChange 
 }) => {
+  const { originCurrency, targetCurrency, effectiveRate } = useCurrency(); // Get currency context
+
+  // Helper to render dual currency format
+  const renderDualCurrency = (amount: number | null | '') => {
+    const numericAmount = Number(amount);
+    if (amount === null || amount === '' || isNaN(numericAmount) || !targetCurrency || !originCurrency || !effectiveRate) return 'N/A';
+
+    const formatted = formatDualCurrency(numericAmount, targetCurrency, originCurrency, effectiveRate);
+    return (
+      <>
+        <span className="font-bold">{formatted.destination}</span>
+        <span className="text-sm font-normal"> / {formatted.origin}</span>
+      </>
+    );
+  };
+
+  // Helper to display origin currency equivalent below inputs
+  const showOriginEquivalent = (amount: number | '') => {
+     const numericAmount = Number(amount);
+     if (amount === null || amount === '' || isNaN(numericAmount) || !targetCurrency || !originCurrency || !effectiveRate || numericAmount <= 0) return null;
+     const formatted = formatDualCurrency(numericAmount, targetCurrency, originCurrency, effectiveRate);
+     return `≈ ${formatted.origin}`;
+  };
 
   // Calculate seasonal average safely
   const calculateSeasonalAverage = (
@@ -87,7 +112,7 @@ const Utilities: React.FC<UtilitiesProps> = ({
     onUtilitiesChange(key, value);
   };
 
-  // Helper component for seasonal inputs
+  // Helper component for seasonal inputs (with currency formatting)
   const SeasonalInputGroup: React.FC<{ 
     baseKey: 'electricity' | 'gasHeating';
     winter: number | '';
@@ -100,20 +125,28 @@ const Utilities: React.FC<UtilitiesProps> = ({
         {key: `${baseKey}Spring`, label: 'Spring', value: spring},
         {key: `${baseKey}Summer`, label: 'Summer', value: summer},
         {key: `${baseKey}Fall`,   label: 'Fall',   value: fall}
-      ].map(season => (
-        <div key={season.key} className="form-control">
-          <label className="label label-text-alt pb-0">{season.label}</label>
-          <input 
-            type="number" 
-            min="0" 
-            step="0.01"
-            placeholder="€"
-            className="input input-bordered input-sm"
-            value={season.value}
-            onChange={(e) => handleInputChange(season.key as keyof Omit<UtilitiesProps, 'onUtilitiesChange'>, e.target.value)}
-          />
-        </div>
-      ))}
+      ].map(season => {
+        const originEquiv = showOriginEquivalent(season.value);
+        return (
+          <div key={season.key} className="form-control">
+            <label className="label label-text-alt pb-0">{season.label} ({targetCurrency})</label>
+            <input 
+              type="number" 
+              min="0" 
+              step="0.01"
+              placeholder="e.g., 90" // Placeholder update
+              className="input input-bordered input-sm"
+              value={season.value}
+              onChange={(e) => handleInputChange(season.key as keyof Omit<UtilitiesProps, 'onUtilitiesChange'>, e.target.value)}
+            />
+            {originEquiv && (
+                <div className="text-xs text-gray-500 mt-1 text-right pr-1">
+                    {originEquiv}
+                </div>
+            )}
+          </div>
+        )
+      })}
     </div>
    );
 
@@ -126,7 +159,7 @@ const Utilities: React.FC<UtilitiesProps> = ({
           {/* --- Electricity --- */}
           <div className="form-control md:col-span-1">
             <label className="label justify-start gap-2">
-              <span className="label-text">Electricity (€/month)</span>
+              <span className="label-text">Electricity ({targetCurrency}/month)</span>
               <input 
                 type="checkbox" 
                 className="toggle toggle-xs toggle-primary"
@@ -136,15 +169,22 @@ const Utilities: React.FC<UtilitiesProps> = ({
               <span className="label-text-alt">Seasonal?</span>
             </label>
             {!isSeasonalElectricity && (
-              <input 
-                type="number" 
-                min="0" 
-                step="0.01"
-                placeholder="e.g., 80"
-                className="input input-bordered" 
-                value={electricity}
-                onChange={(e) => handleInputChange('electricity', e.target.value)} 
-              />
+              <>
+                <input 
+                  type="number" 
+                  min="0" 
+                  step="0.01"
+                  placeholder="e.g., 80"
+                  className="input input-bordered" 
+                  value={electricity}
+                  onChange={(e) => handleInputChange('electricity', e.target.value)} 
+                />
+                 {showOriginEquivalent(electricity) && (
+                    <div className="text-xs text-gray-500 mt-1 text-right pr-1">
+                        {showOriginEquivalent(electricity)}
+                    </div>
+                 )}
+              </>
             )}
           </div>
           {isSeasonalElectricity && (
@@ -161,7 +201,7 @@ const Utilities: React.FC<UtilitiesProps> = ({
 
           {/* --- Water --- */}
           <div className="form-control md:col-span-1">
-            <label className="label"><span className="label-text">Water (€/month)</span></label>
+            <label className="label"><span className="label-text">Water ({targetCurrency}/month)</span></label>
             <input 
               type="number" 
               min="0" 
@@ -171,6 +211,11 @@ const Utilities: React.FC<UtilitiesProps> = ({
               value={water}
               onChange={(e) => handleInputChange('water', e.target.value)} 
             />
+            {showOriginEquivalent(water) && (
+                <div className="text-xs text-gray-500 mt-1 text-right pr-1">
+                    {showOriginEquivalent(water)}
+                </div>
+             )}
           </div>
           {/* Spacer */}
           <div className="hidden md:block md:col-span-2"></div> 
@@ -178,7 +223,7 @@ const Utilities: React.FC<UtilitiesProps> = ({
           {/* --- Gas/Heating --- */}
           <div className="form-control md:col-span-1">
             <label className="label justify-start gap-2">
-              <span className="label-text">Gas/Heating (€/month)</span>
+              <span className="label-text">Gas/Heating ({targetCurrency}/month)</span>
               <input 
                 type="checkbox" 
                 className="toggle toggle-xs toggle-primary"
@@ -188,15 +233,22 @@ const Utilities: React.FC<UtilitiesProps> = ({
               <span className="label-text-alt">Seasonal?</span>
             </label>
             {!isSeasonalGasHeating && (
-              <input 
-                type="number" 
-                min="0" 
-                step="0.01"
-                placeholder="e.g., 100" 
-                className="input input-bordered" 
-                value={gasHeating}
-                onChange={(e) => handleInputChange('gasHeating', e.target.value)} 
-              />
+              <>
+                <input 
+                  type="number" 
+                  min="0" 
+                  step="0.01"
+                  placeholder="e.g., 100" 
+                  className="input input-bordered" 
+                  value={gasHeating}
+                  onChange={(e) => handleInputChange('gasHeating', e.target.value)} 
+                />
+                {showOriginEquivalent(gasHeating) && (
+                    <div className="text-xs text-gray-500 mt-1 text-right pr-1">
+                        {showOriginEquivalent(gasHeating)}
+                    </div>
+                 )}
+               </>
             )}
           </div>
           {isSeasonalGasHeating && (
@@ -213,7 +265,7 @@ const Utilities: React.FC<UtilitiesProps> = ({
 
           {/* --- Internet --- */}
           <div className="form-control md:col-span-1">
-            <label className="label"><span className="label-text">Internet (€/month)</span></label>
+            <label className="label"><span className="label-text">Internet ({targetCurrency}/month)</span></label>
             <input 
               type="number" 
               min="0" 
@@ -223,13 +275,18 @@ const Utilities: React.FC<UtilitiesProps> = ({
               value={internet}
               onChange={(e) => handleInputChange('internet', e.target.value)} 
             />
+            {showOriginEquivalent(internet) && (
+                <div className="text-xs text-gray-500 mt-1 text-right pr-1">
+                    {showOriginEquivalent(internet)}
+                </div>
+             )}
           </div>
            {/* Spacer */}
            <div className="hidden md:block md:col-span-2"></div> 
 
           {/* --- Mobile --- */}
           <div className="form-control md:col-span-1">
-            <label className="label"><span className="label-text">Mobile (€/month)</span></label>
+            <label className="label"><span className="label-text">Mobile ({targetCurrency}/month)</span></label>
             <input 
               type="number" 
               min="0" 
@@ -239,16 +296,24 @@ const Utilities: React.FC<UtilitiesProps> = ({
               value={mobile}
               onChange={(e) => handleInputChange('mobile', e.target.value)} 
             />
+            {showOriginEquivalent(mobile) && (
+                <div className="text-xs text-gray-500 mt-1 text-right pr-1">
+                    {showOriginEquivalent(mobile)}
+                </div>
+             )}
           </div>
            {/* Spacer */}
            <div className="hidden md:block md:col-span-2"></div> 
         </div>
 
-        {/* Total Display */}
+        {/* Total Display - Apply formatting */}
         <div className="mt-6 pt-4 border-t border-base-300">
-          <p className="text-sm font-semibold text-right">Total Monthly Utilities:</p>
-          <p className="text-xl font-bold text-right">€ {totalUtilities.toFixed(2)}</p>
+          <p className="text-sm font-semibold text-right">Total Avg. Monthly Utilities:</p>
+          <p className="text-xl font-bold text-right whitespace-normal">
+            {renderDualCurrency(totalUtilities)}
+          </p>
         </div>
+
       </div>
     </div>
   );

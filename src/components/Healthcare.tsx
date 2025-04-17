@@ -4,6 +4,8 @@ import React, { useMemo } from 'react';
 import HealthcareCoverageSelector from './HealthcareCoverageSelector';
 import { type HouseholdComposition, type HealthcareState, type HealthcareDetails, type CoverageType } from '../app/page';
 import { formatNumberInput, parseFormattedNumber } from '@/utils/transformations/financial.transformations';
+import { useCurrency } from '@/context/CurrencyContext';
+import { formatDualCurrency } from '@/utils/formatting';
 
 interface HealthcareProps {
   household: HouseholdComposition;
@@ -16,7 +18,28 @@ const Healthcare: React.FC<HealthcareProps> = ({
   healthcareState,
   onHealthcareChange,
 }) => {
-  // Determine relevant household members
+  const { originCurrency, targetCurrency, effectiveRate } = useCurrency();
+
+  const renderDualCurrency = (amount: number | null | '' | undefined) => {
+    const numericAmount = Number(amount);
+    if (amount === null || amount === '' || amount === undefined || isNaN(numericAmount) || !targetCurrency || !originCurrency || !effectiveRate) return 'N/A';
+
+    const formatted = formatDualCurrency(numericAmount, targetCurrency, originCurrency, effectiveRate);
+    return (
+      <>
+        <span className="font-bold">{formatted.destination}</span>
+        <span className="text-sm font-normal"> / {formatted.origin}</span>
+      </>
+    );
+  };
+
+  const showOriginEquivalent = (amount: number | '' | undefined) => {
+     const numericAmount = Number(amount);
+     if (amount === null || amount === '' || amount === undefined || isNaN(numericAmount) || !targetCurrency || !originCurrency || !effectiveRate || numericAmount <= 0) return null;
+     const formatted = formatDualCurrency(numericAmount, targetCurrency, originCurrency, effectiveRate);
+     return `≈ ${formatted.origin}`;
+  };
+
   const relevantMembers = Object.entries(household)
     .filter(([, count]) => count > 0)
     .filter(([ageGroup]) => 
@@ -26,7 +49,6 @@ const Healthcare: React.FC<HealthcareProps> = ({
       Array.from({ length: count }, (_, i) => `${ageGroup}-${i + 1}`)
     );
 
-  // Handler for input changes within this component
   const handleInputChange = (
     memberKey: string,
     field: keyof HealthcareDetails,
@@ -35,20 +57,16 @@ const Healthcare: React.FC<HealthcareProps> = ({
     onHealthcareChange(memberKey, { [field]: parseFormattedNumber(value) });
   };
 
-  // Calculate total monthly healthcare costs
   const totalMonthlyCost = useMemo(() => {
     return relevantMembers.reduce((total, memberKey) => {
       const details = healthcareState[memberKey];
       if (!details) return total;
 
       let memberTotal = 0;
-      // Add premium if applicable
       if ((details.type === 'Private' || details.type === 'Hybrid') && details.monthlyPremium) {
         memberTotal += Number(details.monthlyPremium) || 0;
       }
-      // Add OOP estimate
       memberTotal += Number(details.oopEstimate) || 0;
-      // Add recurring medical costs
       memberTotal += Number(details.recurringMedical) || 0;
 
       return total + memberTotal;
@@ -72,36 +90,45 @@ const Healthcare: React.FC<HealthcareProps> = ({
         <h2 className="card-title">Healthcare</h2>
         <p className="text-sm mb-4">Configure healthcare coverage for each relevant adult.</p>
         
-        {relevantMembers.map((memberKey: string) => (
+        {relevantMembers.map((memberKey: string) => {
+          const memberDetails = healthcareState[memberKey];
+          const premiumOriginEquiv = showOriginEquivalent(memberDetails?.monthlyPremium);
+          const oopOriginEquiv = showOriginEquivalent(memberDetails?.oopEstimate);
+          const recurringOriginEquiv = showOriginEquivalent(memberDetails?.recurringMedical);
+
+          return (
           <div key={memberKey} className="mb-4 p-3 border rounded-md bg-base-100">
             <h3 className="font-medium mb-2">{memberKey.replace('-', ' ')}</h3>
             <HealthcareCoverageSelector
               memberKey={memberKey}
-              currentSelection={healthcareState[memberKey]?.type}
+              currentSelection={memberDetails?.type}
               onChange={(update) => onHealthcareChange(memberKey, update)}
             />
 
-            {/* Conditional Premium Input */}
-            {(healthcareState[memberKey]?.type === 'Private' || healthcareState[memberKey]?.type === 'Hybrid') && (
+            {(memberDetails?.type === 'Private' || memberDetails?.type === 'Hybrid') && (
               <div className="form-control w-full mb-2">
                 <label className="label" htmlFor={`premium-${memberKey}`}>
-                  <span className="label-text">Monthly Premium (€)</span>
+                  <span className="label-text">Monthly Premium ({targetCurrency})</span>
                 </label>
                 <input
                   type="text"
                   id={`premium-${memberKey}`}
                   placeholder="e.g., 150"
                   className="input input-bordered w-full"
-                  value={formatNumberInput(healthcareState[memberKey]?.monthlyPremium)}
+                  value={formatNumberInput(memberDetails?.monthlyPremium)}
                   onChange={(e) => handleInputChange(memberKey, 'monthlyPremium', e.target.value)}
                 />
+                {premiumOriginEquiv && (
+                    <div className="text-xs text-gray-500 mt-1 text-right pr-1">
+                        {premiumOriginEquiv}
+                    </div>
+                )}
               </div>
             )}
 
-            {/* OOP Estimate Input */}
             <div className="form-control w-full mb-2">
               <label className="label" htmlFor={`oop-${memberKey}`}>
-                <span className="label-text">Est. Monthly OOP (€)</span>
+                <span className="label-text">Est. Monthly OOP ({targetCurrency})</span>
                 <span className="label-text-alt">(GP, Dental, Rx)</span>
               </label>
               <input
@@ -109,39 +136,52 @@ const Healthcare: React.FC<HealthcareProps> = ({
                 id={`oop-${memberKey}`}
                 placeholder="e.g., 50"
                 className="input input-bordered w-full"
-                value={formatNumberInput(healthcareState[memberKey]?.oopEstimate)}
+                value={formatNumberInput(memberDetails?.oopEstimate)}
                 onChange={(e) => handleInputChange(memberKey, 'oopEstimate', e.target.value)}
               />
+              {oopOriginEquiv && (
+                  <div className="text-xs text-gray-500 mt-1 text-right pr-1">
+                      {oopOriginEquiv}
+                  </div>
+              )}
             </div>
 
-            {/* Recurring Medical Costs Input */}
             <div className="form-control w-full mb-2">
               <label className="label" htmlFor={`recurring-${memberKey}`}>
-                <span className="label-text">Known Monthly Recurring (€)</span>
+                <span className="label-text">Known Monthly Recurring ({targetCurrency})</span>
               </label>
               <input
                 type="text"
                 id={`recurring-${memberKey}`}
                 placeholder="e.g., 0"
                 className="input input-bordered w-full"
-                value={formatNumberInput(healthcareState[memberKey]?.recurringMedical)}
+                value={formatNumberInput(memberDetails?.recurringMedical)}
                 onChange={(e) => handleInputChange(memberKey, 'recurringMedical', e.target.value)}
               />
+              {recurringOriginEquiv && (
+                  <div className="text-xs text-gray-500 mt-1 text-right pr-1">
+                      {recurringOriginEquiv}
+                  </div>
+              )}
             </div>
 
           </div>
-        ))}
+         );
+        })}
 
-        {/* Display Total Costs */}
         <div className="mt-4 pt-4 border-t border-base-300">
           <h3 className="text-lg font-semibold">Healthcare Cost Summary</h3>
-          <div className="flex justify-between mt-2">
-            <span>Total Estimated Monthly Cost:</span>
-            <span className="font-bold">€{formatNumberInput(totalMonthlyCost)}</span>
+          <div className="flex justify-between mt-2 items-center whitespace-normal">
+            <span className="text-sm font-medium">Total Estimated Monthly Cost:</span>
+            <span className="font-bold text-right">
+              {renderDualCurrency(totalMonthlyCost)}
+            </span>
           </div>
-          <div className="flex justify-between mt-1 text-sm text-gray-500">
-            <span>Total Estimated Annual Cost:</span>
-            <span className="font-bold">€{formatNumberInput(totalMonthlyCost * 12)}</span>
+          <div className="flex justify-between mt-1 text-sm text-gray-500 items-center whitespace-normal">
+            <span className="text-xs">Total Estimated Annual Cost:</span>
+            <span className="font-bold text-right">
+              {renderDualCurrency(totalMonthlyCost * 12)}
+            </span>
           </div>
         </div>
 

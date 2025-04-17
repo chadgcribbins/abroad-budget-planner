@@ -10,7 +10,7 @@ import { useCurrency } from '../../context/CurrencyContext';
 
 const IncomeModule: React.FC = () => {
   const { state, dispatch } = useIncome();
-  const { baseCurrency } = useCurrency();
+  const { originCurrency } = useCurrency();
 
   const handleUpdatePartner1 = (payload: SalaryDetails | undefined) => {
     dispatch({ type: 'UPDATE_PARTNER1_SALARY', payload });
@@ -35,7 +35,7 @@ const IncomeModule: React.FC = () => {
             type: '', 
             amount: 0,
             frequency: 'Monthly',
-            currency: baseCurrency || '',
+            currency: originCurrency || 'USD',
             sourceCountry: '',
         }
     });
@@ -55,7 +55,7 @@ const IncomeModule: React.FC = () => {
         payload: { 
             description: '', 
             amount: 0, 
-            currency: baseCurrency || '',
+            currency: originCurrency || 'USD',
             sourceCountry: '',
         } 
     });
@@ -93,7 +93,7 @@ const IncomeModule: React.FC = () => {
                 key={item.id} 
                 item={item} 
                 onUpdate={handleUpdatePassiveIncome} 
-                onRemove={handleRemovePassiveIncome} 
+                onRemove={handleRemovePassiveIncome}
               />
           ))}
           <button 
@@ -117,7 +117,7 @@ const IncomeModule: React.FC = () => {
                 key={item.id} 
                 item={item} 
                 onUpdate={handleUpdateOneOffInflow} 
-                onRemove={handleRemoveOneOffInflow} 
+                onRemove={handleRemoveOneOffInflow}
               />
           ))}
           <button 
