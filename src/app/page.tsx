@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useCallback } from 'react';
+import React, { useState, useCallback, useEffect } from 'react';
 import CountrySelector from '@/components/CountrySelector';
 import ResidencyRegimeSelector from '@/components/ResidencyRegimeSelector';
 import HouseholdSetup from '@/components/HouseholdSetup';
@@ -18,6 +18,7 @@ import { CurrencyProvider, useCurrency } from '@/context/CurrencyContext';
 import { useAppBudget, AppBudgetState } from '@/context/AppBudgetContext';
 import EmergencyBufferModule from '@/components/EmergencyBufferModule';
 import ScenarioManager from '@/components/ScenarioManager/ScenarioManager';
+import StepSidebar from '@/components/Navigation/StepSidebar';
 import { 
     ScenarioSnapshot, 
     saveScenario, 
@@ -27,6 +28,10 @@ import { useIncome } from '@/context/IncomeContext';
 import { useLifestyle, HomeServiceName } from '@/context/LifestyleContext';
 import { useEmergencyBuffer } from '@/context/EmergencyBufferContext';
 import { useTransport } from '@/context/TransportContext';
+import { AppBudgetProvider } from '@/context/AppBudgetContext';
+import { IncomeProvider } from '@/context/IncomeContext';
+import { LifestyleProvider } from '@/context/LifestyleContext';
+import { EmergencyBufferProvider } from '@/context/EmergencyBufferContext';
 
 function AppContent() {
   // Get currency state/handlers from CurrencyContext
@@ -197,7 +202,6 @@ function AppContent() {
           const { appBudgetState: loadedAppBudget } = loadedScenario;
           // Household & Duration
           appBudgetDispatch({ type: 'SET_HOUSEHOLD_COMPOSITION', payload: loadedAppBudget.household });
-          appBudgetDispatch({ type: 'SET_DURATION_OF_STAY', payload: loadedAppBudget.durationOfStayYears });
           // Housing Booleans
           appBudgetDispatch({ type: 'SET_IS_BUYING', payload: loadedAppBudget.isBuying });
           // Housing Fields (Type-safe iteration)
@@ -282,161 +286,233 @@ function AppContent() {
       // No direct state change needed here, user just needs to type a new name and save.
   };
 
+  // --- State for Multi-Step Form ---
+  const [currentStep, setCurrentStep] = useState(0); 
+  const totalSteps = 11; // 0-10
+  const [isStepValid, setIsStepValid] = useState(false); // Validation state
+
+  // --- Validation Logic ---
+  const validateStep = useCallback((step: number) => {
+    // Basic validation example: Step 0 (Profile)
+    if (step === 0) {
+      const profileComplete = 
+        originCountryState !== null && 
+        destinationCountryState !== null &&
+        (destinationCountryState !== 'PT' || selectedRegime !== null) && // NHR check only for PT
+        budgetState.household.Adult > 0 && // At least one adult
+        budgetState.durationOfStayYears > 0; // Duration must be set
+      return profileComplete;
+    }
+    // TODO: Add validation rules for other steps (1-9)
+    // For now, assume other steps are valid to allow progression
+    return true; 
+  }, [originCountryState, destinationCountryState, selectedRegime, budgetState.household, budgetState.durationOfStayYears]);
+
+  // Re-validate whenever the current step or relevant data changes
+  useEffect(() => {
+    setIsStepValid(validateStep(currentStep));
+  }, [currentStep, validateStep]); // Dependency array includes validateStep which depends on form data
+
+  // --- Step Labels for Progress Indicator ---
+  const stepLabels = [
+    "Profile",     // 0
+    "Income",      // 1
+    "Housing",     // 2
+    "Transport",   // 3
+    "Lifestyle",   // 4
+    "Utilities",   // 5
+    "Education",   // 6
+    "Healthcare",  // 7
+    "Emergency", // 8
+    "FX Settings", // 9
+    "Summary"      // 10
+  ];
+
+  // --- Component Rendering Logic ---
+
+  const renderStepComponent = () => {
+    switch (currentStep) {
+      case 0: // Profile & Household Setup
+        return (
+          <>
+            <CountrySelector 
+              label="Origin Country"
+              selectedCountry={originCountryState}
+              onCountryChange={handleOriginCountryChange} 
+            />
+             <CountrySelector 
+               label="Destination Country"
+               selectedCountry={destinationCountryState}
+               onCountryChange={handleDestinationCountryChange} 
+             />
+            {destinationCountryState === 'PT' && ( // Only show NHR selector for Portugal
+              <ResidencyRegimeSelector 
+                selectedCountry={destinationCountryState}
+                selectedRegime={selectedRegime} 
+                onRegimeChange={setSelectedRegime} 
+              />
+            )}
+            <HouseholdSetup 
+              household={budgetState.household} 
+              durationOfStayYears={budgetState.durationOfStayYears} 
+              onHouseholdChange={handleHouseholdChange} 
+            />
+          </>
+        );
+      case 1: // Income
+        return <IncomeModule />;
+      case 2: // Housing
+        return (
+          <Housing 
+            isBuying={budgetState.isBuying}
+            monthlyRent={budgetState.monthlyRent}
+            propertyPrice={budgetState.propertyPrice}
+            downPaymentPercentage={budgetState.downPaymentPercentage}
+            mortgageTermYears={budgetState.mortgageTermYears}
+            mortgageInterestRate={budgetState.mortgageInterestRate}
+            annualMaintenance={budgetState.annualMaintenance}
+            annualInsurance={budgetState.annualInsurance}
+            annualPropertyTax={budgetState.annualPropertyTax}
+            futureUpgradeCost={budgetState.futureUpgradeCost}
+            onHousingChange={handleHousingChange} 
+          />
+        );
+      case 3: // Transport
+        return <TransportModule />;
+      case 4: // Lifestyle
+        return <LifestyleModule />;
+      case 5: // Utilities
+        return (
+          <Utilities 
+            electricity={budgetState.electricity}
+            isSeasonalElectricity={budgetState.isSeasonalElectricity}
+            electricityWinter={budgetState.electricityWinter}
+            electricitySpring={budgetState.electricitySpring}
+            electricitySummer={budgetState.electricitySummer}
+            electricityFall={budgetState.electricityFall}
+            water={budgetState.water}
+            gasHeating={budgetState.gasHeating}
+            isSeasonalGasHeating={budgetState.isSeasonalGasHeating}
+            gasHeatingWinter={budgetState.gasHeatingWinter}
+            gasHeatingSpring={budgetState.gasHeatingSpring}
+            gasHeatingSummer={budgetState.gasHeatingSummer}
+            gasHeatingFall={budgetState.gasHeatingFall}
+            internet={budgetState.internet}
+            mobile={budgetState.mobile}
+            onUtilitiesChange={handleUtilitiesChange} 
+          />
+        );
+      case 6: // Education
+        return <Education household={budgetState.household} educationState={budgetState.educationState} onEducationChange={handleEducationChange} />;
+      case 7: // Healthcare
+        return <Healthcare household={budgetState.household} healthcareState={budgetState.healthcareState} onHealthcareChange={handleHealthcareChange} />;
+      case 8: // Emergency Buffer
+        return <EmergencyBufferModule />;
+      case 9: // FX Settings
+        return <FXSettings />;
+      case 10: // Summary
+        return <BudgetSummaryDisplay profileSettings={profileSettings} />;
+      default:
+        return <div>Invalid Step</div>;
+    }
+  };
+
   return (
-    <div className="container mx-auto px-4 py-8">
-      <h1 className="text-4xl font-bold mb-6">Abroad Budget Planner</h1>
-
-       {/* Country Selectors use local state handlers */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4 p-4 border rounded-lg shadow-sm bg-base-100">
-        <CountrySelector
-          label="Origin Country"
-          selectedCountry={originCountryState}
-          onCountryChange={handleOriginCountryChange}
-        />
-        <CountrySelector
-          label="Destination Country"
-          selectedCountry={destinationCountryState}
-          onCountryChange={handleDestinationCountryChange}
-        />
-      </div>
-
-      {/* Residency Selector uses local state */}
-      <ResidencyRegimeSelector
-        selectedCountry={destinationCountryState}
-        selectedRegime={selectedRegime}
-        onRegimeChange={setSelectedRegime}
-      />
+    <div className="container mx-auto p-4">
+      <h1 className="text-3xl font-bold mb-6 text-center">Living Abroad Budget Planner</h1>
       
-      {/* Components below now use props from budgetState and handlers from useAppBudget */}
-      <HouseholdSetup
-        household={budgetState.household}
-        durationOfStayYears={budgetState.durationOfStayYears}
-        onHouseholdChange={handleHouseholdChange}
-      />
-
-      <Utilities 
-        electricity={budgetState.electricity}
-        isSeasonalElectricity={budgetState.isSeasonalElectricity}
-        electricityWinter={budgetState.electricityWinter}
-        electricitySpring={budgetState.electricitySpring}
-        electricitySummer={budgetState.electricitySummer}
-        electricityFall={budgetState.electricityFall}
-        water={budgetState.water}
-        gasHeating={budgetState.gasHeating}
-        isSeasonalGasHeating={budgetState.isSeasonalGasHeating}
-        gasHeatingWinter={budgetState.gasHeatingWinter}
-        gasHeatingSpring={budgetState.gasHeatingSpring}
-        gasHeatingSummer={budgetState.gasHeatingSummer}
-        gasHeatingFall={budgetState.gasHeatingFall}
-        internet={budgetState.internet}
-        mobile={budgetState.mobile}
-        onUtilitiesChange={handleUtilitiesChange}
-      />
-
-      <Education
-        household={budgetState.household} // Pass household composition
-        educationState={budgetState.educationState}
-        onEducationChange={handleEducationChange}
-      />
-
-      <Healthcare
-        household={budgetState.household} // Pass household composition
-        healthcareState={budgetState.healthcareState}
-        onHealthcareChange={handleHealthcareChange}
-      />
-
-      <EmergencyBufferModule />
-
-      <FXSettings />
-
-      <TransportModule />
-
-      <LifestyleModule />
-
-      <IncomeModule />
-
-      <Housing
-        isBuying={budgetState.isBuying}
-        monthlyRent={budgetState.monthlyRent}
-        propertyPrice={budgetState.propertyPrice}
-        downPaymentPercentage={budgetState.downPaymentPercentage}
-        mortgageTermYears={budgetState.mortgageTermYears}
-        mortgageInterestRate={budgetState.mortgageInterestRate}
-        annualMaintenance={budgetState.annualMaintenance}
-        annualInsurance={budgetState.annualInsurance}
-        annualPropertyTax={budgetState.annualPropertyTax}
-        futureUpgradeCost={budgetState.futureUpgradeCost}
-        onHousingChange={handleHousingChange}
-      />
-
-      {/* Summary needs budgetState and profileSettings */}
-      <BudgetSummaryDisplay 
-        profileSettings={{
-            destinationCountry: profileSettingsState.destinationCountry,
-            originCountry: profileSettingsState.originCountry,
-            isNHRActive: isNHRActive
-        }}
-        // TODO: Pass budgetState or relevant parts to BudgetSummaryDisplay if needed
-      />
-
-      <p className="text-lg my-8">Plan your budget for living abroad with ease.</p>
-      
-      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6 mb-8">
-        <div className="card bg-base-100 shadow-xl">
-          <div className="card-body">
-            <h2 className="card-title">Budget Planning</h2>
-            <p>Create detailed budgets for your time abroad with customizable categories.</p>
-            <div className="card-actions justify-end mt-4">
-              <a href="/budget" className="btn btn-primary">Create Budget</a>
-            </div>
-          </div>
-        </div>
-        
-        <div className="card bg-base-100 shadow-xl">
-          <div className="card-body">
-            <h2 className="card-title">Expense Tracking</h2>
-            <p>Record and monitor your daily expenses to stay within your budget.</p>
-            <div className="card-actions justify-end mt-4">
-              <a href="/expenses" className="btn btn-outline">Track Expenses</a>
-            </div>
-          </div>
-        </div>
-        
-        <div className="card bg-base-100 shadow-xl">
-          <div className="card-body">
-            <h2 className="card-title">Cost Comparison</h2>
-            <p>Compare living costs between different destinations around the world.</p>
-            <div className="card-actions justify-end mt-4">
-              <a href="/compare" className="btn btn-outline">Compare Costs</a>
-            </div>
-          </div>
-        </div>
-      </div>
-      
-      <div className="flex flex-col md:flex-row gap-6 items-center justify-between p-6 bg-base-200 rounded-lg">
-        <div>
-          <h2 className="text-2xl font-bold mb-2">Ready to plan your adventure?</h2>
-          <p className="max-w-md">Start by creating a budget tailored to your destination and travel style.</p>
-        </div>
-        <a href="/destinations" className="btn btn-primary">Browse Destinations</a>
-      </div>
-
-      {/* Scenario Manager Component */}
+      {/* Scenario Manager might need repositioning or stay here */}
       <ScenarioManager 
           onSaveScenario={handleSaveScenario}
           onLoadScenario={handleLoadScenario}
-          onCloneScenario={handleCloneScenario} // Pass the clone handler
+          onCloneScenario={handleCloneScenario}
       />
+      
+      {/* Flex container for Sidebar + Main Content */}
+      <div className="flex flex-col md:flex-row gap-8 mt-8">
+        {/* Sidebar Component */}
+        <StepSidebar 
+            stepLabels={stepLabels}
+            currentStep={currentStep}
+            setCurrentStep={setCurrentStep}
+        />
+
+        {/* Main Content Area */}
+        <div className="flex-grow border rounded-lg p-6 bg-base-100 shadow-md">
+          {/* Progress Indicator */}
+          <ul className="steps steps-horizontal w-full mb-8">
+            {stepLabels.map((label, index) => (
+              <li 
+                key={label}
+                className={`step ${index <= currentStep ? 'step-primary' : ''}`}
+              >
+                {label}
+              </li>
+            ))}
+          </ul>
+
+          {/* Render the component for the current step */}
+          {renderStepComponent()}
+          
+          {/* Navigation Buttons */}
+          <div className="mt-6 flex justify-between">
+            {/* Show Previous button only if not on the first step */}
+            {currentStep > 0 && (
+               <button 
+                 onClick={() => setCurrentStep(prev => Math.max(prev - 1, 0))} 
+                 className="btn btn-secondary"> {/* Use secondary style for back */}
+                 Previous
+               </button>
+            )}
+            {/* Add a spacer div to push the Next/Finish button to the right when Previous is hidden */}
+            {currentStep === 0 && <div />} 
+
+             {/* Show Next button only if not on the last step AND step is valid */}
+            {currentStep < totalSteps - 1 && (
+               <button 
+                 onClick={() => setCurrentStep(prev => Math.min(prev + 1, totalSteps - 1))} 
+                 className={`btn btn-primary ${!isStepValid ? 'btn-disabled' : ''}`}
+                 disabled={!isStepValid} // Disable button if step is invalid
+               >
+                 Next
+               </button>
+            )}
+            
+            {/* Show View Summary button only on the last step */}
+             {currentStep === totalSteps - 1 && (
+               <button className="btn btn-success"> {/* Use success style for final step */}
+                 View Summary
+               </button>
+             )}
+          </div>
+        </div>
+      </div>
+
+      {/* Optionally, always show summary at the bottom or only on the last step */}
+      {/* For now, BudgetSummaryDisplay is the last step (case 10) */}
+      {/* 
+      <div className="mt-8">
+        <BudgetSummaryDisplay profileSettings={profileSettings} />
+      </div> 
+      */}
     </div>
   );
 }
 
 export default function Home() {
   return (
-    <TransportProvider>
-      <CurrencyProvider>
-        <AppContent />
-      </CurrencyProvider>
-    </TransportProvider>
+    <CurrencyProvider>
+      <AppBudgetProvider>
+        <IncomeProvider>
+           <TransportProvider>
+             <LifestyleProvider>
+               <EmergencyBufferProvider>
+                 <AppContent /> 
+               </EmergencyBufferProvider>
+              </LifestyleProvider>
+          </TransportProvider>
+        </IncomeProvider>
+      </AppBudgetProvider>
+    </CurrencyProvider>
   );
 } 
