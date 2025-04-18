@@ -104,9 +104,9 @@ const Education: React.FC<EducationProps> = ({
         elements.push(
           <div key={childKey} className="mb-4 p-3 border rounded-md bg-base-200/30">
             {/* Toggle Switch */}
-            <div className="form-control w-full max-w-xs mb-2">
+            <div className="form-control w-full mb-2">
               <label className="label cursor-pointer">
-                <span className="label-text font-medium">{`${ageGroup} Child ${i + 1} Education`}</span>
+                <span className="label-text font-medium md:text-lg">{`${ageGroup} Child ${i + 1} Education`}</span>
                 <div className="flex items-center">
                   <span className={`mr-2 text-sm ${currentChoice === 'public' ? 'font-semibold text-primary' : ''}`}>Public</span>
                   <input
@@ -125,14 +125,14 @@ const Education: React.FC<EducationProps> = ({
             {currentChoice === 'private' && (
               <div className="mt-2 space-y-2 pl-2 border-l-2 border-primary/50">
                 {/* Annual Tuition */}
-                <div className="form-control w-full max-w-xs">
+                <div className="form-control w-full">
                   <label className="label">
-                    <span className="label-text">Annual Tuition ({targetCurrency})</span>
+                    <span className="label-text text-sm md:text-base">Annual Tuition ({targetCurrency})</span>
                   </label>
                   <input
                     type="text" // Use text for formatted input
                     placeholder="e.g., 10,000"
-                    className="input input-bordered w-full max-w-xs input-sm"
+                    className="input input-bordered w-full input"
                     value={formatNumberInput(currentDetails.annualTuition)}
                     onChange={(e) => handleInputChange(childKey, 'annualTuition', e.target.value)}
                     inputMode="decimal" // Hint for mobile keyboards
@@ -145,15 +145,15 @@ const Education: React.FC<EducationProps> = ({
                 </div>
 
                 {/* Extra Costs */}
-                <div className="form-control w-full max-w-xs">
+                <div className="form-control w-full">
                   <label className="label">
-                    <span className="label-text">Annual Extra Costs ({targetCurrency})</span>
+                    <span className="label-text text-sm md:text-base">Annual Extra Costs ({targetCurrency})</span>
                     <span className="label-text-alt">(Books, Uniforms, Activities)</span>
                   </label>
                   <input
                     type="text" // Use text for formatted input
                     placeholder="e.g., 500"
-                    className="input input-bordered w-full max-w-xs input-sm"
+                    className="input input-bordered w-full input"
                     value={formatNumberInput(currentDetails.extraCosts)}
                     onChange={(e) => handleInputChange(childKey, 'extraCosts', e.target.value)}
                     inputMode="decimal"
@@ -185,8 +185,8 @@ const Education: React.FC<EducationProps> = ({
   return (
     <div className="card bg-base-100 shadow-xl mb-4">
       <div className="card-body">
-        <h2 className="card-title">Education Choices & Costs</h2>
-        <p className="text-sm text-base-content/70 mb-4">Select public or private schooling for each child. For private, enter estimated annual costs.</p>
+        <h2 className="card-title lg:text-2xl">Education Choices & Costs</h2>
+        <p className="text-sm md:text-base text-base-content/70 mb-4">Select public or private schooling for each child. For private, enter estimated annual costs.</p>
         
         {childInputs.length > 0 ? (
           childInputs
@@ -199,10 +199,10 @@ const Education: React.FC<EducationProps> = ({
         {/* Display Household Totals - Apply formatting */}
         {childInputs.length > 0 && (
           <div className="mt-4 pt-4 border-t border-base-300 text-right">
-            <p className="font-semibold whitespace-normal">
+            <p className="font-semibold md:text-lg whitespace-normal">
               Total Avg. Monthly Education Cost: {renderDualCurrency(educationCosts.totalMonthlyCost)}
             </p>
-            <p className="text-sm text-base-content/80 whitespace-normal">
+            <p className="text-sm md:text-base text-base-content/80 whitespace-normal">
               (Total Annual: {renderDualCurrency(educationCosts.totalAnnualCost)})
             </p>
           </div>

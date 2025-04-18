@@ -418,83 +418,69 @@ function AppContent() {
   };
 
   return (
-    <div className="container mx-auto p-4">
-      <h1 className="text-3xl font-bold mb-6 text-center">Living Abroad Budget Planner</h1>
-      
-      {/* Scenario Manager might need repositioning or stay here */}
-      <ScenarioManager 
-          onSaveScenario={handleSaveScenario}
-          onLoadScenario={handleLoadScenario}
-          onCloneScenario={handleCloneScenario}
-      />
-      
-      {/* Flex container for Sidebar + Main Content */}
-      <div className="flex flex-col md:flex-row gap-8 mt-8">
-        {/* Sidebar Component */}
-        <StepSidebar 
-            stepLabels={stepLabels}
-            currentStep={currentStep}
-            setCurrentStep={setCurrentStep}
-        />
-
-        {/* Main Content Area */}
-        <div className="flex-grow border rounded-lg p-6 bg-base-100 shadow-md">
-          {/* Progress Indicator */}
-          <ul className="steps steps-horizontal w-full mb-8">
-            {stepLabels.map((label, index) => (
-              <li 
-                key={label}
-                className={`step ${index <= currentStep ? 'step-primary' : ''}`}
-              >
-                {label}
-              </li>
-            ))}
-          </ul>
-
-          {/* Render the component for the current step */}
-          {renderStepComponent()}
-          
-          {/* Navigation Buttons */}
-          <div className="mt-6 flex justify-between">
-            {/* Show Previous button only if not on the first step */}
+    <div className="container mx-auto px-4">
+        <div className="flex flex-col lg:flex-row gap-4 py-4">
+            {/* Step Sidebar (conditionally rendered) */}
             {currentStep > 0 && (
-               <button 
-                 onClick={() => setCurrentStep(prev => Math.max(prev - 1, 0))} 
-                 className="btn btn-secondary"> {/* Use secondary style for back */}
-                 Previous
-               </button>
+                <div className="lg:w-1/4 hidden lg:block">
+                    <StepSidebar 
+                        stepLabels={stepLabels}
+                        currentStep={currentStep}
+                        setCurrentStep={setCurrentStep}
+                    />
+                </div>
             )}
-            {/* Add a spacer div to push the Next/Finish button to the right when Previous is hidden */}
-            {currentStep === 0 && <div />} 
 
-             {/* Show Next button only if not on the last step AND step is valid */}
-            {currentStep < totalSteps - 1 && (
-               <button 
-                 onClick={() => setCurrentStep(prev => Math.min(prev + 1, totalSteps - 1))} 
-                 className={`btn btn-primary ${!isStepValid ? 'btn-disabled' : ''}`}
-                 disabled={!isStepValid} // Disable button if step is invalid
-               >
-                 Next
-               </button>
-            )}
-            
-            {/* Show View Summary button only on the last step */}
-             {currentStep === totalSteps - 1 && (
-               <button className="btn btn-success"> {/* Use success style for final step */}
-                 View Summary
-               </button>
-             )}
-          </div>
+            {/* Main Content Area */}
+            <div className="flex-grow border rounded-lg p-6 bg-base-100 shadow-md">
+                {/* Progress Indicator */}
+                <ul className="steps steps-horizontal w-full mb-8">
+                    {stepLabels.map((label, index) => (
+                        <li 
+                            key={label}
+                            className={`step ${index <= currentStep ? 'step-primary' : ''}`}
+                        >
+                            {label}
+                        </li>
+                    ))}
+                </ul>
+
+                {/* Render the component for the current step */}
+                {renderStepComponent()}
+                
+                {/* Navigation Buttons */}
+                <div className="mt-6 flex justify-between">
+                    {/* Show Previous button only if not on the first step */}
+                    {currentStep > 0 && (
+                        <button 
+                            onClick={() => setCurrentStep(prev => Math.max(prev - 1, 0))} 
+                            className="btn btn-secondary"> {/* Use secondary style for back */}
+                            Previous
+                        </button>
+                    )}
+                    {/* Add a spacer div to push the Next/Finish button to the right when Previous is hidden */}
+                    {currentStep === 0 && <div />} 
+
+                    {/* Show Next button only if not on the last step AND step is valid */}
+                    {currentStep < totalSteps - 1 && (
+                        <button 
+                            onClick={() => setCurrentStep(prev => Math.min(prev + 1, totalSteps - 1))} 
+                            className={`btn btn-primary ${!isStepValid ? 'btn-disabled' : ''}`}
+                            disabled={!isStepValid} // Disable button if step is invalid
+                        >
+                            Next
+                        </button>
+                    )}
+                    
+                    {/* Show View Summary button only on the last step */}
+                    {currentStep === totalSteps - 1 && (
+                        <button className="btn btn-success"> {/* Use success style for final step */}
+                            View Summary
+                        </button>
+                    )}
+                </div>
+            </div>
         </div>
-      </div>
-
-      {/* Optionally, always show summary at the bottom or only on the last step */}
-      {/* For now, BudgetSummaryDisplay is the last step (case 10) */}
-      {/* 
-      <div className="mt-8">
-        <BudgetSummaryDisplay profileSettings={profileSettings} />
-      </div> 
-      */}
     </div>
   );
 }

@@ -1,8 +1,8 @@
 'use client';
 
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { 
-    saveScenario, 
+    saveScenario as saveScenarioUtil, 
     loadScenarioByName, 
     deleteScenario, 
     listSavedScenarios, 
@@ -21,6 +21,7 @@ const ScenarioManager: React.FC<ScenarioManagerProps> = ({ onSaveScenario, onLoa
     const [savedScenarios, setSavedScenarios] = useState<{ name: string; timestamp: number }[]>([]);
     const [isLoading, setIsLoading] = useState<boolean>(false);
     const [feedbackMessage, setFeedbackMessage] = useState<string | null>(null);
+    const fileInputRef = useRef<HTMLInputElement>(null); // Ref for file input
 
     const refreshScenarioList = useCallback(() => {
         setSavedScenarios(listSavedScenarios());
@@ -80,6 +81,109 @@ const ScenarioManager: React.FC<ScenarioManagerProps> = ({ onSaveScenario, onLoa
             setFeedbackMessage('Current scenario state ready to be saved with a new name.');
             onCloneScenario(); // Parent handles setting up state for save
         }
+    };
+
+    // --- Export Logic ---
+    const handleExportAll = () => {
+        setIsLoading(true);
+        setFeedbackMessage('Exporting scenarios...');
+        try {
+            const scenarioNames = listSavedScenarios().map(s => s.name);
+            const allScenarioData = scenarioNames.map(name => loadScenarioByName(name)).filter(s => s !== null) as ScenarioSnapshot[];
+
+            if (allScenarioData.length === 0) {
+                setFeedbackMessage('No scenarios to export.');
+                setIsLoading(false);
+                return;
+            }
+
+            const jsonString = JSON.stringify(allScenarioData, null, 2);
+            const blob = new Blob([jsonString], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const link = document.createElement('a');
+            link.href = url;
+            const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
+            link.download = `budget_scenarios_${timestamp}.json`;
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            URL.revokeObjectURL(url);
+            setFeedbackMessage('All scenarios exported successfully.');
+        } catch (error) {
+            console.error('Error exporting scenarios:', error);
+            setFeedbackMessage('Error exporting scenarios.');
+        } finally {
+            setIsLoading(false);
+        }
+    };
+
+    // --- Import Logic ---
+    const handleImportClick = () => {
+        fileInputRef.current?.click(); // Trigger hidden file input
+    };
+
+    const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+        const file = event.target.files?.[0];
+        if (!file) {
+            return;
+        }
+
+        setIsLoading(true);
+        setFeedbackMessage('Importing scenarios...');
+        const reader = new FileReader();
+
+        reader.onload = (e) => {
+            try {
+                const text = e.target?.result;
+                if (typeof text !== 'string') {
+                    throw new Error('Failed to read file content.');
+                }
+                const importedData = JSON.parse(text);
+                
+                // Basic validation (check if it's an array)
+                if (!Array.isArray(importedData)) {
+                     throw new Error('Invalid file format: Expected an array of scenarios.');
+                }
+
+                let importedCount = 0;
+                let skippedCount = 0;
+
+                importedData.forEach((scenario: any) => {
+                    // Basic validation for scenario object
+                    if (scenario && typeof scenario === 'object' && scenario.name && scenario.timestamp) {
+                         // TODO: Add more robust validation of scenario structure if needed
+                        const success = saveScenarioUtil(scenario); // Use renamed import
+                        if (success) {
+                            importedCount++;
+                        } else {
+                           skippedCount++; // Failed to save (e.g., invalid data, though saveScenarioUtil might not return false)
+                        }
+                    } else {
+                        console.warn('Skipping invalid scenario object during import:', scenario);
+                        skippedCount++;
+                    }
+                });
+                
+                refreshScenarioList();
+                 setFeedbackMessage(`Import complete. Imported: ${importedCount}, Skipped/Failed: ${skippedCount}.`);
+            } catch (error) {
+                console.error('Error importing scenarios:', error);
+                setFeedbackMessage(`Error importing file: ${error instanceof Error ? error.message : 'Unknown error'}`);
+            } finally {
+                setIsLoading(false);
+                // Reset file input value to allow importing the same file again
+                if (fileInputRef.current) {
+                     fileInputRef.current.value = '';
+                }
+            }
+        };
+
+        reader.onerror = () => {
+            setFeedbackMessage('Error reading file.');
+            setIsLoading(false);
+        };
+
+        reader.readAsText(file);
     };
 
     return (
@@ -158,6 +262,34 @@ const ScenarioManager: React.FC<ScenarioManagerProps> = ({ onSaveScenario, onLoa
                      ) : (
                          <p className="text-sm italic text-base-content/70">No scenarios saved yet.</p>
                      )}
+                 </div>
+
+                 {/* Import/Export Section */}                  
+                 <div className="mt-4 pt-4 border-t border-base-300 flex justify-end gap-2">
+                     <input 
+                        type="file"
+                        ref={fileInputRef}
+                        onChange={handleFileChange}
+                        accept=".json"
+                        className="hidden" // Hide the default file input
+                        disabled={isLoading}
+                    />
+                     <button 
+                        className={`btn btn-sm btn-outline ${isLoading ? 'btn-disabled' : ''}`}
+                        onClick={handleImportClick}
+                        disabled={isLoading}
+                        title="Import scenarios from a JSON file"
+                    >
+                         Import
+                    </button>
+                    <button 
+                        className={`btn btn-sm btn-outline ${isLoading ? 'btn-disabled' : ''}`}
+                        onClick={handleExportAll}
+                        disabled={isLoading || savedScenarios.length === 0}
+                        title="Export all saved scenarios to a JSON file"
+                    >
+                         Export All
+                    </button>
                  </div>
 
                  {/* Feedback Message */}                 

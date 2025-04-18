@@ -78,8 +78,8 @@ const Healthcare: React.FC<HealthcareProps> = ({
     return (
       <div className="card bg-base-200 shadow-xl mb-4">
         <div className="card-body">
-          <h2 className="card-title">Healthcare</h2>
-          <p>No household members require healthcare planning in this configuration.</p>
+          <h2 className="card-title lg:text-2xl">Healthcare</h2>
+          <p className="text-sm md:text-base">No household members require healthcare planning in this configuration.</p>
         </div>
       </div>
     );
@@ -88,8 +88,8 @@ const Healthcare: React.FC<HealthcareProps> = ({
   return (
     <div className="card bg-base-200 shadow-xl mb-4">
       <div className="card-body">
-        <h2 className="card-title">Healthcare</h2>
-        <p className="text-sm mb-4">Configure healthcare coverage for each relevant adult.</p>
+        <h2 className="card-title lg:text-2xl">Healthcare</h2>
+        <p className="text-sm md:text-base mb-4">Configure healthcare coverage for each relevant adult.</p>
         
         {relevantMembers.map((memberKey: string) => {
           const memberDetails = healthcareState[memberKey];
@@ -99,7 +99,7 @@ const Healthcare: React.FC<HealthcareProps> = ({
 
           return (
           <div key={memberKey} className="mb-4 p-3 border rounded-md bg-base-100">
-            <h3 className="font-medium mb-2">{memberKey.replace('-', ' ')}</h3>
+            <h3 className="font-medium md:text-lg mb-2">{memberKey.replace('-', ' ')}</h3>
             <HealthcareCoverageSelector
               memberKey={memberKey}
               currentSelection={memberDetails?.type}
@@ -109,7 +109,7 @@ const Healthcare: React.FC<HealthcareProps> = ({
             {(memberDetails?.type === 'Private' || memberDetails?.type === 'Hybrid') && (
               <div className="form-control w-full mb-2">
                 <label className="label" htmlFor={`premium-${memberKey}`}>
-                  <span className="label-text">Monthly Premium ({targetCurrency})</span>
+                  <span className="label-text text-sm md:text-base">Monthly Premium ({targetCurrency})</span>
                 </label>
                 <input
                   type="text"
@@ -129,7 +129,7 @@ const Healthcare: React.FC<HealthcareProps> = ({
 
             <div className="form-control w-full mb-2">
               <label className="label" htmlFor={`oop-${memberKey}`}>
-                <span className="label-text">Est. Monthly OOP ({targetCurrency})</span>
+                <span className="label-text text-sm md:text-base">Est. Monthly OOP ({targetCurrency})</span>
                 <span className="label-text-alt">(GP, Dental, Rx)</span>
               </label>
               <input
@@ -149,7 +149,7 @@ const Healthcare: React.FC<HealthcareProps> = ({
 
             <div className="form-control w-full mb-2">
               <label className="label" htmlFor={`recurring-${memberKey}`}>
-                <span className="label-text">Known Monthly Recurring ({targetCurrency})</span>
+                <span className="label-text text-sm md:text-base">Known Monthly Recurring ({targetCurrency})</span>
               </label>
               <input
                 type="text"
@@ -171,16 +171,16 @@ const Healthcare: React.FC<HealthcareProps> = ({
         })}
 
         <div className="mt-4 pt-4 border-t border-base-300">
-          <h3 className="text-lg font-semibold">Healthcare Cost Summary</h3>
+          <h3 className="text-lg md:text-xl font-semibold">Healthcare Cost Summary</h3>
           <div className="flex justify-between mt-2 items-center whitespace-normal">
-            <span className="text-sm font-medium">Total Estimated Monthly Cost:</span>
-            <span className="font-bold text-right">
+            <span className="text-sm font-medium md:text-base">Total Estimated Monthly Cost:</span>
+            <span className="font-bold md:text-lg text-right">
               {renderDualCurrency(totalMonthlyCost)}
             </span>
           </div>
           <div className="flex justify-between mt-1 text-sm text-gray-500 items-center whitespace-normal">
-            <span className="text-xs">Total Estimated Annual Cost:</span>
-            <span className="font-bold text-right">
+            <span className="text-xs md:text-sm">Total Estimated Annual Cost:</span>
+            <span className="font-bold md:text-base text-right">
               {renderDualCurrency(totalMonthlyCost * 12)}
             </span>
           </div>

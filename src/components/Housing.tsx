@@ -123,7 +123,7 @@ const Housing: React.FC<HousingProps> = ({
   return (
     <div className="card bg-base-100 shadow-xl mb-4">
       <div className="card-body">
-        <h2 className="card-title">Housing</h2>
+        <h2 className="card-title lg:text-2xl">Housing</h2>
         <div className="form-control">
           <label className="label cursor-pointer">
             <span className="label-text">{isBuying ? 'Buying' : 'Renting'}</span>
@@ -167,8 +167,8 @@ const Housing: React.FC<HousingProps> = ({
             </div>
             {/* Placeholder for Calculated Mortgage Payment */}
             <div className="mt-4 p-2 bg-base-200 rounded">
-              <p className="text-sm font-semibold">Estimated Monthly Mortgage: </p>
-              <p className="text-lg whitespace-normal">
+              <p className="text-sm md:text-base font-semibold">Estimated Monthly Mortgage: </p>
+              <p className="text-lg lg:text-xl whitespace-normal">
                 {renderMainDualCurrency(monthlyMortgagePayment)}
               </p>
             </div>

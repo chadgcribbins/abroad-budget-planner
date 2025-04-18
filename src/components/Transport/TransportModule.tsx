@@ -76,7 +76,7 @@ const NumberInput: React.FC<NumberInputProps> = ({
     return (
         <div className="form-control">
             <label className="label">
-                <span className="label-text">{label} ({targetCurrency})</span>
+                <span className="label-text text-sm md:text-base">{label} ({targetCurrency})</span>
             </label>
             <input
                 type="number"
@@ -122,12 +122,12 @@ const TransportModule: React.FC = () => {
 
   return (
     <div className="mb-6 p-4 border rounded-lg shadow-sm bg-base-100">
-      <h2 className="text-2xl font-semibold mb-4 border-b pb-2">Transportation</h2>
+      <h2 className="text-2xl lg:text-3xl font-semibold mb-4 border-b pb-2">Transportation</h2>
 
       {/* Car Ownership Toggle */}
       <div className="form-control mb-4">
         <label className="label cursor-pointer justify-start gap-4">
-          <span className="label-text text-lg font-medium">Do you plan to own/lease a car?</span> 
+          <span className="label-text text-lg md:text-xl font-medium">Do you plan to own/lease a car?</span>
           <input 
             type="checkbox" 
             className="toggle toggle-primary" 
@@ -140,7 +140,7 @@ const TransportModule: React.FC = () => {
       {/* Conditional Car Details Section */}
       {state.hasCar && (
         <div className="mb-4 p-4 border border-dashed rounded-md bg-base-200/30">
-          <h3 className="text-xl font-medium mb-3">Car Details</h3>
+          <h3 className="text-xl lg:text-2xl font-medium mb-3">Car Details</h3>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             {/* Car Type (Radio) */}
             <div className="form-control">
@@ -232,7 +232,7 @@ const TransportModule: React.FC = () => {
 
       {/* Public Transport Section */}
       <div className="mb-4 p-4 border border-dashed rounded-md bg-base-200/30">
-         <h3 className="text-xl font-medium mb-3">Public Transport & Other</h3>
+         <h3 className="text-xl lg:text-2xl font-medium mb-3">Public Transport & Other</h3>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <NumberInput
                 label="Monthly Public Transport Pass(es)"

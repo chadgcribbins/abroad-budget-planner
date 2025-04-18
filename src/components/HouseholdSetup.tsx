@@ -46,8 +46,8 @@ const HouseholdSetup: React.FC<HouseholdSetupProps> = ({ household, durationOfSt
   return (
     <div className="card bg-base-100 shadow-xl mb-4">
       <div className="card-body">
-        <h2 className="card-title">Household Setup</h2>
-        <p>Define who is moving and for how long.</p>
+        <h2 className="card-title text-xl lg:text-2xl">Household Setup</h2>
+        <p className="text-sm md:text-base">Define who is moving and for how long.</p>
 
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-4">
           {ageGroups.map((group) => (

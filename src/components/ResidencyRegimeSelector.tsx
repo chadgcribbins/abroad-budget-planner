@@ -25,7 +25,7 @@ const ResidencyRegimeSelector: React.FC<ResidencyRegimeSelectorProps> = ({
 
   return (
     <div className="mt-4 p-4 border rounded shadow-sm">
-      <h2 className="text-lg font-semibold mb-2">Residency Regime</h2>
+      <h2 className="text-lg md:text-xl font-semibold mb-2">Residency Regime</h2>
       {!selectedCountry ? (
         <p className="text-sm text-gray-500">Please select a destination country first.</p>
       ) : isPortugalSelected ? (

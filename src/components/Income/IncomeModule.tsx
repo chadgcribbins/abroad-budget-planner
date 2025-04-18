@@ -63,11 +63,11 @@ const IncomeModule: React.FC = () => {
 
   return (
     <div className="mb-6">
-      <h2 className="text-2xl font-semibold mb-4 border-b pb-2">Income Sources</h2>
+      <h2 className="text-2xl lg:text-3xl font-semibold mb-4 border-b pb-2">Income Sources</h2>
       
       {/* Partner Salaries */}
       <div className="mb-6">
-          <h3 className="text-xl font-medium mb-3">Salaries</h3>
+          <h3 className="text-xl lg:text-2xl font-medium mb-3">Salaries</h3>
           <SalaryInput 
             partnerLabel="Partner 1"
             value={state.partner1Salary}
@@ -82,7 +82,7 @@ const IncomeModule: React.FC = () => {
 
       {/* Passive Income Section */}
       <div className="mb-6">
-          <h3 className="text-xl font-medium mb-3">Passive Income</h3>
+          <h3 className="text-xl lg:text-2xl font-medium mb-3">Passive Income</h3>
           {state.passiveIncomes.length === 0 && (
               <p className="text-sm text-gray-500 italic mb-3">
                   No passive income sources added yet.
@@ -106,7 +106,7 @@ const IncomeModule: React.FC = () => {
 
       {/* One-Off Inflows Section */}
       <div className="mb-6">
-          <h3 className="text-xl font-medium mb-3">One-Off Inflows</h3>
+          <h3 className="text-xl lg:text-2xl font-medium mb-3">One-Off Inflows</h3>
           {state.oneOffInflows.length === 0 && (
               <p className="text-sm text-gray-500 italic mb-3">
                   No one-off inflows added yet.

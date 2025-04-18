@@ -65,14 +65,14 @@ const EmergencyBufferModule: React.FC = () => {
   return (
     <div className="card bg-base-200 shadow-xl mb-4">
       <div className="card-body">
-        <h2 className="card-title">Emergency Buffer Calculator</h2>
-        <p className="text-sm mb-4">Plan your safety net for unexpected events.</p>
+        <h2 className="card-title lg:text-2xl">Emergency Buffer Calculator</h2>
+        <p className="text-sm md:text-base mb-4">Plan your safety net for unexpected events.</p>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
           {/* Input Fields */}
           <div className="form-control">
             <label className="label">
-              <span className="label-text">Target Months of Coverage</span>
+              <span className="label-text text-sm md:text-base">Target Months of Coverage</span>
             </label>
             <input
               type="number"
@@ -87,7 +87,7 @@ const EmergencyBufferModule: React.FC = () => {
 
           <div className="form-control">
             <label className="label">
-              <span className="label-text">Current Reserve Amount ({targetCurrency || 'Target'})</span>
+              <span className="label-text text-sm md:text-base">Current Reserve Amount ({targetCurrency || 'Target'})</span>
             </label>
             <input
               type="number"
@@ -106,19 +106,19 @@ const EmergencyBufferModule: React.FC = () => {
           <div className="stats stats-vertical lg:stats-horizontal shadow bg-base-100">
             <div className="stat">
               <div className="stat-title">Est. Fixed Monthly Costs</div>
-              <div className="stat-value text-lg">{formatCurrency(calculatedMonthlyExpenses, targetCurrency)}</div>
+              <div className="stat-value text-lg lg:text-xl">{formatCurrency(calculatedMonthlyExpenses, targetCurrency)}</div>
               <div className="stat-desc">Based on your inputs</div>
             </div>
 
             <div className="stat">
               <div className="stat-title">Target Buffer Amount</div>
-              <div className="stat-value text-lg">{formatCurrency(targetAmount, targetCurrency)}</div>
+              <div className="stat-value text-lg lg:text-xl">{formatCurrency(targetAmount, targetCurrency)}</div>
               <div className="stat-desc">({targetMonths} months coverage)</div>
             </div>
 
             <div className="stat">
               <div className="stat-title">Current Shortfall</div>
-              <div className={`stat-value text-lg ${shortfall > 0 ? 'text-error' : 'text-success'}`}>
+              <div className={`stat-value text-lg lg:text-xl ${shortfall > 0 ? 'text-error' : 'text-success'}`}>
                 {formatCurrency(shortfall, targetCurrency)}
               </div>
               <div className="stat-desc">{shortfall > 0 ? `Needed to reach target` : `Target met! 🎉`}</div>
@@ -136,7 +136,7 @@ const EmergencyBufferModule: React.FC = () => {
                 value={progressPercent}
                 max="100"
             ></progress>
-            <div className="text-center text-lg font-semibold mt-2">
+            <div className="text-center text-lg lg:text-xl font-semibold mt-2">
                 {isFinite(runwayMonths) ? `${runwayMonths.toFixed(1)} Months Runway` : 'Buffer Target Met'}
             </div>
              <p className="text-xs text-center text-base-content/70 mt-1">
@@ -149,7 +149,7 @@ const EmergencyBufferModule: React.FC = () => {
         
         {/* Recommendation Display */}
         <div className="mt-4 p-3 bg-base-100 rounded-lg shadow-inner">
-            <p className="text-sm italic text-base-content/80">
+            <p className="text-sm md:text-base italic text-base-content/80">
                 {recommendationText}
             </p>
         </div>

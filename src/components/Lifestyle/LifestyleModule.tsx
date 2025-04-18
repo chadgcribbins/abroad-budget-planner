@@ -16,9 +16,12 @@ export const LifestyleModule: React.FC = () => {
   const { originCurrency, targetCurrency, effectiveRate } = useCurrency();
 
   // Helper to render dual currency format
-  const renderDualCurrency = (amount: number | null | '' | undefined) => {
-    const numericAmount = Number(amount);
-    if (amount === null || amount === '' || amount === undefined || isNaN(numericAmount) || !targetCurrency || !originCurrency || !effectiveRate) return 'N/A';
+  const renderDualCurrency = (amount: number | undefined | null) => {
+    if (amount === null || amount === undefined || isNaN(amount)) return 'N/A';
+    if (!targetCurrency || !originCurrency || !effectiveRate) return 'N/A';
+    
+    const numericAmount = amount;
+    
     const formatted = formatDualCurrency(numericAmount, targetCurrency, originCurrency, effectiveRate);
     return (
       <>
@@ -217,12 +220,12 @@ export const LifestyleModule: React.FC = () => {
   return (
     <div className="card bg-base-100 shadow-xl mb-6">
       <div className="card-body">
-        <h2 className="card-title">Lifestyle & Discretionary Costs</h2>
+        <h2 className="card-title lg:text-2xl">Lifestyle & Discretionary Costs</h2>
 
         {/* General Shopping Spend */}
         <div className="form-control w-full mb-4">
           <label className="label">
-            <span className="label-text">General Shopping Spend ({targetCurrency})</span>
+            <span className="label-text text-sm md:text-base">General Shopping Spend ({targetCurrency})</span>
             <span className="label-text-alt">(Groceries, clothing, hobbies, etc.)</span>
           </label>
           <div className="join">
@@ -249,92 +252,64 @@ export const LifestyleModule: React.FC = () => {
           </div>
           {showInputOriginEquivalent(state.generalShoppingSpend.amount, state.generalShoppingSpend.frequency) && (
             <label className="label">
-              <span className="label-text-alt">
-                {showInputOriginEquivalent(state.generalShoppingSpend.amount, state.generalShoppingSpend.frequency)}
-              </span>
+              <span className="label-text-alt">{showInputOriginEquivalent(state.generalShoppingSpend.amount, state.generalShoppingSpend.frequency)}</span>
             </label>
           )}
         </div>
         
-        {/* --- One-Off Big Purchases --- */}
-        <div className="divider">One-Off Big Purchases ({targetCurrency})</div>
-
-        {/* Add New Purchase Form */}
-        <div className="flex flex-col sm:flex-row gap-2 mb-4">
-          <input
-            type="text"
-            placeholder="Purchase Name (e.g., Laptop)"
-            className="input input-bordered flex-grow"
-            value={newPurchaseName}
-            onChange={(e) => setNewPurchaseName(e.target.value)}
-          />
-          <div className="form-control">
-              <input
-                type="number"
-                placeholder="Amount"
-                className="input input-bordered w-full sm:w-32"
-                value={newPurchaseAmount?.toString() ?? ''}
-                onChange={(e) => {
-                    const valStr = e.target.value;
-                    const num = valStr === '' ? undefined : parseFloat(valStr);
-                    setNewPurchaseAmount(isNaN(num as number) ? undefined : num); 
-                }}
-                min="0"
-              />
-               {/* Call helper directly with number | undefined state */} 
-               {showOriginEquivalent(newPurchaseAmount, true) && (
-                 <div className="text-xs text-gray-500 mt-1 text-right pr-1">
-                    {showOriginEquivalent(newPurchaseAmount, true)}
-                 </div>
-               )}
+        {/* One-Off Big Purchases */}
+        <div className="mt-4 pt-4 border-t border-base-300">
+          <h3 className="text-xl lg:text-2xl font-medium mb-3">One-Off Big Purchases</h3>
+          <p className="text-xs italic text-gray-500 mb-3">Annual costs for infrequent large purchases (e.g., new laptop, furniture).</p>
+          {state.oneOffPurchases.length > 0 && (
+             <ul className="space-y-1 mb-2 max-h-40 overflow-y-auto">
+                 {state.oneOffPurchases.map((item) => {
+                    // Convert item.amount to number before passing
+                    const numericAmount = Number(item.amount);
+                    return (
+                        <li key={item.id} className="flex justify-between items-center bg-base-200/50 p-2 rounded">
+                            <span>{item.name}</span>
+                            <div className="flex items-center gap-2">
+                               <span className="text-sm font-mono">
+                                   {renderDualCurrency(isNaN(numericAmount) ? undefined : numericAmount)}
+                               </span>
+                                <button 
+                                    className="btn btn-xs btn-ghost text-error" 
+                                    onClick={() => handleRemoveOneOffPurchase(item.id)}
+                                >
+                                    X
+                                </button>
+                           </div>
+                       </li>
+                    );
+                 })}
+            </ul>
+          )}
+          <div className="flex gap-2 items-end mt-2">
+            <input
+              type="text"
+              placeholder="Purchase Name"
+              className="input input-sm input-bordered flex-grow"
+              value={newPurchaseName}
+              onChange={(e) => setNewPurchaseName(e.target.value)}
+            />
+            <input
+              type="number"
+              placeholder={`Amount (${targetCurrency})`}
+              className="input input-sm input-bordered w-32"
+              value={newPurchaseAmount ?? ''}
+              onChange={(e) => setNewPurchaseAmount(e.target.value === '' ? undefined : parseFloat(e.target.value) || undefined)}
+              min="0"
+            />
+            <button className="btn btn-sm btn-primary" onClick={handleAddOneOffPurchase}>Add</button>
           </div>
-          <button 
-            className="btn btn-secondary"
-            onClick={handleAddOneOffPurchase}
-          >
-            Add Purchase
-          </button>
         </div>
 
-        {/* List of Purchases */}
-        {state.oneOffPurchases.length > 0 && (
-          <div className="overflow-x-auto mb-4">
-            <table className="table table-zebra table-sm w-full">
-              <thead>
-                <tr>
-                  <th>Name</th>
-                  <th>Amount ({targetCurrency}/yr)</th>
-                  <th>Equivalent ({originCurrency}/yr)</th>
-                  <th>Action</th>
-                </tr>
-              </thead>
-              <tbody>
-                {state.oneOffPurchases.map((item) => (
-                  <tr key={item.id}>
-                    <td>{item.name}</td>
-                    {/* Ensure item.amount is treated as number */}
-                    <td>{(Number(item.amount) || 0).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</td>
-                    <td>{formatDualCurrency(Number(item.amount) || 0, targetCurrency ?? '', originCurrency ?? '', effectiveRate).origin || '---'}</td>
-                    <td>
-                      <button 
-                        className="btn btn-xs btn-error btn-outline"
-                        onClick={() => handleRemoveOneOffPurchase(item.id)}
-                      >
-                        Remove
-                      </button>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        )}
-
-        {/* --- Travel & Holidays --- */}
-        <div className="divider">Travel & Holidays</div>
-        <div className="form-control w-full mb-4">
+        {/* Travel & Holidays */}
+        <div className="form-control w-full mb-4 mt-4 pt-4 border-t border-base-300">
+           <h3 className="text-xl lg:text-2xl font-medium mb-3">Travel & Holidays</h3>
           <label className="label">
-            <span className="label-text">Travel Budget ({targetCurrency})</span>
+            <span className="label-text text-sm md:text-base">Travel Budget ({targetCurrency})</span>
           </label>
           <div className="join">
             <input
@@ -358,62 +333,62 @@ export const LifestyleModule: React.FC = () => {
               Annual
             </button>
           </div>
-           {showInputOriginEquivalent(state.travelHolidaysBudget.amount, state.travelHolidaysBudget.frequency) && (
+          {showInputOriginEquivalent(state.travelHolidaysBudget.amount, state.travelHolidaysBudget.frequency) && (
             <label className="label">
-              <span className="label-text-alt">
-                {showInputOriginEquivalent(state.travelHolidaysBudget.amount, state.travelHolidaysBudget.frequency)}
-              </span>
+              <span className="label-text-alt">{showInputOriginEquivalent(state.travelHolidaysBudget.amount, state.travelHolidaysBudget.frequency)}</span>
             </label>
           )}
         </div>
 
-        {/* --- Home Services --- */}
-        <div className="divider">Home Services</div>
-        {renderHomeServiceInput('cleaner', 'Cleaner')}
-        {renderHomeServiceInput('babysitter', 'Babysitter / Nanny')}
-        {renderHomeServiceInput('gardening', 'Gardener')}
-        {renderHomeServiceInput('petCare', 'Pet Care / Walker')}
+        {/* Home Services */}
+        <div className="mt-4 pt-4 border-t border-base-300">
+          <h3 className="text-xl lg:text-2xl font-medium mb-3">Home Services</h3>
+           {renderHomeServiceInput('cleaner', 'Cleaner')}
+           {renderHomeServiceInput('babysitter', 'Babysitter / Nanny')}
+           {renderHomeServiceInput('gardening', 'Gardening')}
+           {renderHomeServiceInput('petCare', 'Pet Care')}
+        </div>
 
-        {/* --- Contingency --- */}
-        <div className="divider">Contingency / Unknowns</div>
-        <div className="form-control w-full mb-4">
-          <label className="label">
-            <span className="label-text">Contingency Type</span>
-          </label>
-          <div className="join mb-2">
-            <button
-              className={`btn join-item ${state.contingency.type === 'fixed' ? 'btn-active' : ''}`}
-              onClick={() => handleContingencyTypeChange('fixed')}
-            >
-              Fixed Amount ({targetCurrency})
-            </button>
-            <button
-              className={`btn join-item ${state.contingency.type === 'percentage' ? 'btn-active' : ''}`}
-              onClick={() => handleContingencyTypeChange('percentage')}
-            >
-              Percentage (% of Base)
-            </button>
-          </div>
-          <div className="form-control">
-            <input
-              type="number"
-              placeholder={state.contingency.type === 'fixed' ? "Amount" : "Percentage"}
-              className="input input-bordered w-full max-w-xs"
-              value={state.contingency.value}
-              onChange={handleContingencyValueChange}
-              min="0"
-              step={state.contingency.type === 'fixed' ? "any" : "1"}
-            />
-            {state.contingency.type === 'fixed' && showOriginEquivalent(state.contingency.value) && (
-                <div className="text-xs text-gray-500 mt-1 text-right pr-1 w-full max-w-xs">
-                    {showOriginEquivalent(state.contingency.value)}
+        {/* Contingency / Unknowns */}
+        <div className="mt-4 pt-4 border-t border-base-300">
+           <h3 className="text-xl lg:text-2xl font-medium mb-3">Contingency / Unknowns</h3>
+           <p className="text-xs italic text-gray-500 mb-3">Buffer for unexpected costs.</p>
+           <div className="flex gap-4 items-center mb-2">
+                <span className="label-text text-sm md:text-base">Type:</span>
+                <div className="join">
+                    <button 
+                        className={`btn btn-sm join-item ${state.contingency.type === 'fixed' ? 'btn-active' : ''}`} 
+                        onClick={() => handleContingencyTypeChange('fixed')}
+                    >
+                        Fixed ({targetCurrency})
+                    </button>
+                    <button 
+                        className={`btn btn-sm join-item ${state.contingency.type === 'percentage' ? 'btn-active' : ''}`} 
+                        onClick={() => handleContingencyTypeChange('percentage')}
+                    >
+                        % of Base Lifestyle
+                    </button>
                 </div>
-            )}
-          </div>
-          {/* Display calculated contingency amount */}
-          <div className="mt-2 text-sm text-right font-medium whitespace-normal">
-             Contingency Added: {renderDualCurrency(finalContingencyAmount)}
-          </div>
+           </div>
+            <div className="form-control w-full max-w-xs">
+                <label className="label">
+                    <span className="label-text text-sm md:text-base">Value ({state.contingency.type === 'percentage' ? '%' : targetCurrency})</span>
+                </label>
+                <input 
+                    type="number" 
+                    className="input input-bordered w-full"
+                    value={state.contingency.value}
+                    onChange={handleContingencyValueChange}
+                    min="0"
+                    step={state.contingency.type === 'percentage' ? '1' : 'any'}
+                />
+            </div>
+            {/* Display calculated amount */}
+            <div className="mt-2 p-2 bg-base-200 rounded inline-block">
+                 <span className="text-sm">Adds ≈ </span>
+                 <span className="text-lg lg:text-xl font-semibold">{renderDualCurrency(finalContingencyAmount)}</span>
+                 <span className="text-sm"> per month</span>
+            </div>
         </div>
 
         {/* --- Total Lifestyle Cost --- */}

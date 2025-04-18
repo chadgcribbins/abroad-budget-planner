@@ -153,13 +153,13 @@ const Utilities: React.FC<UtilitiesProps> = ({
   return (
     <div className="card bg-base-100 shadow-xl mb-4">
       <div className="card-body">
-        <h2 className="card-title">Utilities</h2>
+        <h2 className="card-title lg:text-2xl">Utilities</h2>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-x-4 gap-y-2 mt-4 items-start">
           {/* --- Electricity --- */}
           <div className="form-control md:col-span-1">
             <label className="label justify-start gap-2">
-              <span className="label-text">Electricity ({targetCurrency}/month)</span>
+              <span className="label-text text-sm md:text-base">Electricity ({targetCurrency}/month)</span>
               <input 
                 type="checkbox" 
                 className="toggle toggle-xs toggle-primary"
@@ -201,7 +201,7 @@ const Utilities: React.FC<UtilitiesProps> = ({
 
           {/* --- Water --- */}
           <div className="form-control md:col-span-1">
-            <label className="label"><span className="label-text">Water ({targetCurrency}/month)</span></label>
+            <label className="label"><span className="label-text text-sm md:text-base">Water ({targetCurrency}/month)</span></label>
             <input 
               type="number" 
               min="0" 
@@ -223,7 +223,7 @@ const Utilities: React.FC<UtilitiesProps> = ({
           {/* --- Gas/Heating --- */}
           <div className="form-control md:col-span-1">
             <label className="label justify-start gap-2">
-              <span className="label-text">Gas/Heating ({targetCurrency}/month)</span>
+              <span className="label-text text-sm md:text-base">Gas/Heating ({targetCurrency}/month)</span>
               <input 
                 type="checkbox" 
                 className="toggle toggle-xs toggle-primary"
@@ -265,7 +265,7 @@ const Utilities: React.FC<UtilitiesProps> = ({
 
           {/* --- Internet --- */}
           <div className="form-control md:col-span-1">
-            <label className="label"><span className="label-text">Internet ({targetCurrency}/month)</span></label>
+            <label className="label"><span className="label-text text-sm md:text-base">Internet ({targetCurrency}/month)</span></label>
             <input 
               type="number" 
               min="0" 
@@ -286,7 +286,7 @@ const Utilities: React.FC<UtilitiesProps> = ({
 
           {/* --- Mobile --- */}
           <div className="form-control md:col-span-1">
-            <label className="label"><span className="label-text">Mobile ({targetCurrency}/month)</span></label>
+            <label className="label"><span className="label-text text-sm md:text-base">Mobile ({targetCurrency}/month)</span></label>
             <input 
               type="number" 
               min="0" 
@@ -307,11 +307,10 @@ const Utilities: React.FC<UtilitiesProps> = ({
         </div>
 
         {/* Total Display - Apply formatting */}
-        <div className="mt-6 pt-4 border-t border-base-300">
-          <p className="text-sm font-semibold text-right">Total Avg. Monthly Utilities:</p>
-          <p className="text-xl font-bold text-right whitespace-normal">
-            {renderDualCurrency(totalUtilities)}
-          </p>
+        <div className="md:col-span-3 mt-6 pt-4 border-t border-base-300 text-right">
+          <span className="text-lg lg:text-xl font-semibold">
+             Total Monthly Utilities: {renderDualCurrency(totalUtilities)}
+          </span>
         </div>
 
       </div>

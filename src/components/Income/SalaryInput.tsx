@@ -94,7 +94,7 @@ const SalaryInput: React.FC<SalaryInputProps> = ({
 
   return (
     <div className="mb-4 p-4 border rounded-lg shadow-sm bg-base-100 relative">
-      <h3 className="text-lg font-semibold mb-2">{partnerLabel} Salary</h3>
+      <h3 className="text-lg md:text-xl font-semibold mb-2">{partnerLabel} Salary</h3>
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         {/* Amount Input */}
         <div className="form-control">

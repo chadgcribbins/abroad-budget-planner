@@ -1060,20 +1060,54 @@
       "id": 20,
       "title": "Implement Scenario Save Functionality",
       "description": "Create functionality to save and load budget scenarios.",
-      "status": "pending",
+      "status": "done",
       "dependencies": [
         4,
         17
       ],
       "priority": "medium",
       "details": "Implement local storage saving of complete scenarios. Create UI for naming and managing saved scenarios. Add export functionality to JSON format. For MVP, focus on client-side storage rather than server persistence.",
-      "testStrategy": "Test saving and loading scenarios from local storage. Verify that all data is correctly preserved when loading a saved scenario. Test edge cases like loading with incompatible schema versions."
+      "testStrategy": "Test saving and loading scenarios from local storage. Verify that all data is correctly preserved when loading a saved scenario. Test edge cases like loading with incompatible schema versions.",
+      "subtasks": [
+        {
+          "id": 1,
+          "title": "Implement State Serialization and Local Storage Integration",
+          "description": "Create functionality to serialize the budget scenario state and save it to browser's local storage",
+          "dependencies": [],
+          "details": "Implementation steps:\n1. Define a data structure for serialized scenarios that includes all necessary budget data, scenario name, and timestamp\n2. Create a ScenarioStorage service with methods for:\n   - serializeCurrentState(): Convert current application state to storable format\n   - saveToLocalStorage(scenarioName): Save serialized state with a name\n   - listSavedScenarios(): Return metadata about all saved scenarios\n   - loadFromLocalStorage(scenarioId): Retrieve a saved scenario\n   - deleteFromLocalStorage(scenarioId): Remove a saved scenario\n3. Implement error handling for storage limits and invalid data\n4. Add unit tests for serialization/deserialization logic\n5. Test with various budget scenarios to ensure all data is properly preserved\n\nTesting approach:\n- Write unit tests for the serialization/deserialization logic\n- Test storage and retrieval of scenarios with different complexity levels\n- Verify proper error handling when storage limits are reached",
+          "status": "done",
+          "parentTaskId": 20
+        },
+        {
+          "id": 2,
+          "title": "Create UI for Scenario Management",
+          "description": "Develop user interface components for saving, loading, and managing budget scenarios",
+          "dependencies": [
+            1
+          ],
+          "details": "Implementation steps:\n1. Create a ScenarioManager modal component with tabs for:\n   - Save Current Scenario (with name input field)\n   - Load Saved Scenario (with list of saved scenarios)\n   - Manage Scenarios (rename, delete options)\n2. Implement a ScenarioList component to display saved scenarios with:\n   - Scenario name\n   - Creation/modification date\n   - Action buttons (load, rename, delete)\n3. Add confirmation dialogs for overwriting and deletion actions\n4. Create success/error notification components for feedback\n5. Connect UI components to the ScenarioStorage service from subtask 1\n6. Add keyboard shortcuts for common operations (Ctrl+S for save, etc.)\n\nTesting approach:\n- Test UI rendering with various screen sizes\n- Verify all user interactions work as expected\n- Test edge cases like attempting to save without a name\n- Ensure proper feedback is shown for all operations",
+          "status": "done",
+          "parentTaskId": 20
+        },
+        {
+          "id": 3,
+          "title": "Implement JSON Export and Import Functionality",
+          "description": "Add capability to export scenarios to JSON files and import them back into the application",
+          "dependencies": [
+            1,
+            2
+          ],
+          "details": "Implementation steps:\n1. Extend the ScenarioStorage service with:\n   - exportToJson(scenarioId): Generate downloadable JSON file\n   - importFromJson(file): Parse uploaded JSON and validate structure\n2. Add export/import buttons to the ScenarioManager UI\n3. Create a file upload component for importing scenarios\n4. Implement validation for imported files to ensure they match expected format\n5. Add version information to exported files for future compatibility\n6. Handle potential conflicts when importing (e.g., same scenario name exists)\n7. Provide detailed error messages for invalid imports\n\nTesting approach:\n- Test export functionality with various scenario complexities\n- Test importing valid and invalid JSON files\n- Verify round-trip functionality (export then import)\n- Test handling of malformed JSON files\n- Ensure proper error messages are displayed for invalid imports",
+          "status": "done",
+          "parentTaskId": 20
+        }
+      ]
     },
     {
       "id": 21,
       "title": "Develop Responsive Design",
       "description": "Ensure the application is fully responsive across desktop, tablet, and mobile devices.",
-      "status": "pending",
+      "status": "done",
       "dependencies": [
         2,
         19
@@ -1088,7 +1122,7 @@
           "description": "Configure Tailwind's responsive breakpoints and establish the base responsive layout structure for the application",
           "dependencies": [],
           "details": "1. Review and customize Tailwind's default breakpoints in tailwind.config.js to match project requirements (sm, md, lg, xl, 2xl)\n2. Create a responsive container component that will serve as the base layout wrapper\n3. Implement a responsive navigation system that transforms into a mobile menu on smaller screens\n4. Set up responsive grid layouts for main content areas using Tailwind's grid utilities\n5. Test the base layout structure across different viewport sizes\n6. Document the responsive strategy and breakpoint standards for the team",
-          "status": "pending",
+          "status": "done",
           "parentTaskId": 21
         },
         {
@@ -1099,7 +1133,7 @@
             1
           ],
           "details": "1. Define a responsive typography scale using Tailwind's text utilities with different sizes at different breakpoints\n2. Create utility classes for responsive margins and padding that adjust based on screen size\n3. Implement responsive font sizes for headings, body text, and UI elements\n4. Ensure proper line heights and letter spacing for readability on all devices\n5. Test text overflow and wrapping behavior on small screens\n6. Create a documentation page showing the typography system across breakpoints",
-          "status": "pending",
+          "status": "done",
           "parentTaskId": 21
         },
         {
@@ -1111,7 +1145,7 @@
             2
           ],
           "details": "1. Identify components that need mobile-specific variants (data tables, complex forms, charts, etc.)\n2. Create simplified mobile versions of data tables that stack or reformat content\n3. Implement collapsible sections for complex forms on mobile\n4. Develop touch-friendly alternatives for hover-dependent components\n5. Create mobile-specific navigation patterns (bottom tabs, etc.)\n6. Test each component variant on actual mobile devices\n7. Document when and how to use each component variant",
-          "status": "pending",
+          "status": "done",
           "parentTaskId": 21
         },
         {
@@ -1122,7 +1156,7 @@
             3
           ],
           "details": "1. Increase touch target sizes for all interactive elements (minimum 44x44px)\n2. Add appropriate spacing between touch targets to prevent accidental taps\n3. Implement mobile-optimized form layouts with full-width inputs\n4. Create touch-friendly custom form controls (dropdowns, date pickers, etc.)\n5. Ensure form validation messages are clearly visible on small screens\n6. Test form completion on various mobile devices and browsers\n7. Implement mobile-specific keyboard types for different input fields",
-          "status": "pending",
+          "status": "done",
           "parentTaskId": 21
         },
         {
@@ -1136,7 +1170,7 @@
             4
           ],
           "details": "1. Create a testing matrix covering key device/browser combinations\n2. Test the application on actual physical devices (not just browser emulation)\n3. Identify and fix layout issues, touch target problems, and visual inconsistencies\n4. Optimize image loading with responsive images (srcset, sizes attributes)\n5. Implement performance optimizations for mobile users (reduced animations, etc.)\n6. Test and optimize load times on slower mobile connections\n7. Document any device-specific workarounds or considerations\n8. Create a responsive design QA checklist for future features",
-          "status": "pending",
+          "status": "done",
           "parentTaskId": 21
         }
       ]

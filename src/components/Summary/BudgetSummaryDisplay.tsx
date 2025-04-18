@@ -244,7 +244,7 @@ const BudgetSummaryDisplay: React.FC<BudgetSummaryDisplayProps> = ({
    if (!originCurrency || !targetCurrency) {
      return (
        <div className="mt-6 p-4 border rounded-lg shadow bg-base-100">
-         <h2 className="text-2xl font-semibold mb-4">Budget Summary</h2>
+         <h2 className="text-2xl lg:text-3xl font-semibold mb-4">Budget Summary</h2>
          <p className="text-sm text-gray-500 italic">Select origin and destination countries to view summary.</p>
        </div>
      );
@@ -254,7 +254,7 @@ const BudgetSummaryDisplay: React.FC<BudgetSummaryDisplayProps> = ({
 
   return (
     <div className="mt-6 space-y-6">
-      <h2 className="text-3xl font-semibold mb-4">Budget Summary Dashboard</h2>
+      <h2 className="text-2xl lg:text-3xl font-semibold mb-4">Budget Summary Dashboard</h2>
       
       {/* Row 1: Key Metrics */}
       <div className="stats stats-vertical lg:stats-horizontal shadow w-full bg-primary text-primary-content">
@@ -291,16 +291,15 @@ const BudgetSummaryDisplay: React.FC<BudgetSummaryDisplayProps> = ({
           {/* Required Gross Income Card */}
           <div className="card bg-base-100 shadow-md">
               <div className="card-body">
-                  <h3 className="card-title text-lg">Required Gross Income</h3>
-                  <p className="text-2xl font-bold">
+                  <h3 className="card-title text-lg lg:text-xl">Required Gross Income</h3>
+                  <p className="text-2xl md:text-3xl font-bold">
                       {isNaN(requiredGrossIncome) 
                           ? "N/A" 
                           : formatDualCurrency(requiredGrossIncome, targetCurrency, originCurrency, baselineRate).destination
                       }
                   </p>
-                   {/* Display origin currency equivalent if calculation was successful */}
                   {!isNaN(requiredGrossIncome) && (
-                      <p className="text-sm font-normal">
+                      <p className="text-sm md:text-base font-normal">
                           {` / ${formatDualCurrency(requiredGrossIncome, targetCurrency, originCurrency, baselineRate).origin}`}
                       </p>
                   )}
@@ -311,8 +310,8 @@ const BudgetSummaryDisplay: React.FC<BudgetSummaryDisplayProps> = ({
            {/* Emergency Buffer Card - Use emergencyBufferState */}
           <div className="card bg-base-100 shadow-md">
               <div className="card-body">
-                  <h3 className="card-title text-lg">Emergency Buffer</h3>
-                   <p className="text-2xl font-bold">
+                  <h3 className="card-title text-lg lg:text-xl">Emergency Buffer</h3>
+                   <p className="text-2xl md:text-3xl font-bold">
                       {isFinite(emergencyBufferState.calculatedFixedMonthlyExpenses > 0 ? (emergencyBufferState.currentReserveAmount / emergencyBufferState.calculatedFixedMonthlyExpenses) : Infinity) 
                         ? `${(emergencyBufferState.currentReserveAmount / emergencyBufferState.calculatedFixedMonthlyExpenses).toFixed(1)} Months`
                         : 'N/A' }
@@ -326,8 +325,8 @@ const BudgetSummaryDisplay: React.FC<BudgetSummaryDisplayProps> = ({
           {/* Placeholder Card */}
           <div className="card bg-base-100 shadow-md">
               <div className="card-body">
-                  <h3 className="card-title text-lg">Placeholder Insight</h3>
-                   <p className="text-2xl font-bold">[Data Here]</p>
+                  <h3 className="card-title text-lg lg:text-xl">Placeholder Insight</h3>
+                   <p className="text-2xl md:text-3xl font-bold">[Data Here]</p>
                   <p className="text-xs text-base-content/70">More insights coming soon.</p>
               </div>
           </div>
@@ -342,18 +341,18 @@ const BudgetSummaryDisplay: React.FC<BudgetSummaryDisplayProps> = ({
                        {/* --- FX Simulation Impact Section --- */}
                       {fxSimulationPercentage !== 0 ? (
                         <div className="">
-                          <h3 className="text-lg font-semibold text-info-content mb-3">
+                          <h3 className="text-lg lg:text-xl font-semibold text-info-content mb-3">
                             FX Simulation Impact ({fxSimulationPercentage > 0 ? '+':''}{fxSimulationPercentage}% Change)
                           </h3>
                           <div className="overflow-x-auto">
                                 <table className="table table-sm w-full text-sm">
                                 <thead>
                                     <tr className="bg-base-200">
-                                    <th>Metric</th>
-                                    <th>Baseline Value ({targetCurrency})</th>
-                                    <th>Simulated Value ({targetCurrency})</th>
-                                    <th>Difference ({targetCurrency})</th>
-                                    <th>Difference (%)</th>
+                                    <th className="md:text-base">Metric</th>
+                                    <th className="md:text-base">Baseline Value ({targetCurrency})</th>
+                                    <th className="md:text-base">Simulated Value ({targetCurrency})</th>
+                                    <th className="md:text-base">Difference ({targetCurrency})</th>
+                                    <th className="md:text-base">Difference (%)</th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -368,11 +367,11 @@ const BudgetSummaryDisplay: React.FC<BudgetSummaryDisplayProps> = ({
                                     
                                     return (
                                         <tr key={item.label}>
-                                        <td className="font-medium">{item.label}</td>
-                                        <td>{formatDualCurrency(item.baseline, targetCurrency, originCurrency, baselineRate).destination}</td>
-                                        <td>{formatDualCurrency(item.simulated, targetCurrency, originCurrency, effectiveRate).destination}</td>
-                                        <td className={`${diff >= 0 ? 'text-success' : 'text-error'} font-medium`}>{diffText.destination}</td>
-                                        <td className={`${diff >= 0 ? 'text-success' : 'text-error'} font-medium`}>{percDiff !== Infinity ? `${percDiff.toFixed(1)}%` : 'N/A'}</td>
+                                        <td className="font-medium md:text-base">{item.label}</td>
+                                        <td className="md:text-base">{formatDualCurrency(item.baseline, targetCurrency, originCurrency, baselineRate).destination}</td>
+                                        <td className="md:text-base">{formatDualCurrency(item.simulated, targetCurrency, originCurrency, effectiveRate).destination}</td>
+                                        <td className={`${diff >= 0 ? 'text-success' : 'text-error'} font-medium md:text-base`}>{diffText.destination}</td>
+                                        <td className={`${diff >= 0 ? 'text-success' : 'text-error'} font-medium md:text-base`}>{percDiff !== Infinity ? `${percDiff.toFixed(1)}%` : 'N/A'}</td>
                                         </tr>
                                     );
                                     })}
@@ -390,22 +389,22 @@ const BudgetSummaryDisplay: React.FC<BudgetSummaryDisplayProps> = ({
 
                   <input type="radio" name="summary_tabs" role="tab" className="tab" aria-label="Rent vs Buy" />
                   <div role="tabpanel" className="tab-content bg-base-100 border-base-300 rounded-box p-6">
-                      <h3 className="text-lg font-semibold mb-3">Rent vs. Buy Comparison</h3>
+                      <h3 className="text-lg lg:text-xl font-semibold mb-3">Rent vs. Buy Comparison</h3>
                       {(rentMonthlyCost > 0 || buyMonthlyTotalCost > 0) ? (
                           <div className="overflow-x-auto">
                               <table className="table table-sm w-full text-sm">
                                   <thead>
                                       <tr className="bg-base-200">
-                                          <th>Metric</th>
-                                          <th>Renting</th>
-                                          <th>Buying</th>
+                                          <th className="md:text-base">Metric</th>
+                                          <th className="md:text-base">Renting</th>
+                                          <th className="md:text-base">Buying</th>
                                       </tr>
                                   </thead>
                                   <tbody>
                                       <tr>
-                                          <td className="font-medium">Est. Monthly Cost</td>
-                                          <td>{formatDualCurrency(rentMonthlyCost, targetCurrency, originCurrency, baselineRate).destination}</td>
-                                          <td>{formatDualCurrency(buyMonthlyTotalCost, targetCurrency, originCurrency, baselineRate).destination}</td>
+                                          <td className="font-medium md:text-base">Est. Monthly Cost</td>
+                                          <td className="md:text-base">{formatDualCurrency(rentMonthlyCost, targetCurrency, originCurrency, baselineRate).destination}</td>
+                                          <td className="md:text-base">{formatDualCurrency(buyMonthlyTotalCost, targetCurrency, originCurrency, baselineRate).destination}</td>
                                       </tr>
                                        <tr>
                                           <td className="font-medium"></td>
@@ -413,9 +412,9 @@ const BudgetSummaryDisplay: React.FC<BudgetSummaryDisplayProps> = ({
                                           <td className="text-xs text-base-content/60">({formatDualCurrency(buyMonthlyTotalCost, targetCurrency, originCurrency, baselineRate).origin})</td>
                                       </tr>
                                       <tr>
-                                          <td className="font-medium">Est. Upfront Cost</td>
-                                          <td>{formatDualCurrency(rentUpfrontCost, targetCurrency, originCurrency, baselineRate).destination}</td>
-                                          <td>{formatDualCurrency(buyUpfrontCost, targetCurrency, originCurrency, baselineRate).destination}</td>
+                                          <td className="font-medium md:text-base">Est. Upfront Cost</td>
+                                          <td className="md:text-base">{formatDualCurrency(rentUpfrontCost, targetCurrency, originCurrency, baselineRate).destination}</td>
+                                          <td className="md:text-base">{formatDualCurrency(buyUpfrontCost, targetCurrency, originCurrency, baselineRate).destination}</td>
                                       </tr>
                                        <tr>
                                           <td className="font-medium"></td>
@@ -435,12 +434,12 @@ const BudgetSummaryDisplay: React.FC<BudgetSummaryDisplayProps> = ({
 
                   <input type="radio" name="summary_tabs" role="tab" className="tab" aria-label="School Cost" />
                   <div role="tabpanel" className="tab-content bg-base-100 border-base-300 rounded-box p-6">
-                      <h3 className="text-lg font-semibold mb-3">Private School Cost Analysis</h3>
+                      <h3 className="text-lg lg:text-xl font-semibold mb-3">Private School Cost Analysis</h3>
                       {annualNetSchoolCost > 0 ? (
                           <div className="space-y-3">
                               <div>
-                                  <p className="text-sm text-base-content/80">Net Annual / Monthly School Cost:</p>
-                                  <p className="text-xl font-semibold">
+                                  <p className="text-sm md:text-base text-base-content/80">Net Annual / Monthly School Cost:</p>
+                                  <p className="text-xl md:text-2xl font-semibold">
                                       {formatDualCurrency(annualNetSchoolCost, targetCurrency, originCurrency, baselineRate).destination}
                                        / {formatCurrency(monthlyNetSchoolCost, targetCurrency)} monthly
                                   </p>
@@ -451,8 +450,8 @@ const BudgetSummaryDisplay: React.FC<BudgetSummaryDisplayProps> = ({
                               </div>
                               
                               <div>
-                                  <p className="text-sm text-base-content/80">Est. Gross Income Required ('Felt Cost'):</p>
-                                  <p className="text-xl font-semibold">
+                                  <p className="text-sm md:text-base text-base-content/80">Est. Gross Income Required ('Felt Cost'):</p>
+                                  <p className="text-xl md:text-2xl font-semibold">
                                       {isNaN(requiredGrossSchoolCost)
                                           ? "N/A"
                                           : formatDualCurrency(requiredGrossSchoolCost, targetCurrency, originCurrency, baselineRate).destination
