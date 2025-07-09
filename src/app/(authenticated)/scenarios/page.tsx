@@ -1,14 +1,17 @@
 'use client';
 
 import React, { useState, useMemo } from 'react';
+import { useRouter } from 'next/navigation';
 import { useScenarioStore } from '@/src/store/slices/scenarioSlice';
 import { useUIStore } from '@/src/store/slices/uiSlice';
+import { useProfileStore } from '@/src/store/slices/profileSlice';
 import { ScenarioCard } from '@/src/components/scenarios/ScenarioCard';
 import { CreateScenarioModal } from '@/src/components/scenarios/CreateScenarioModal';
 import { DeleteConfirmModal } from '@/src/components/scenarios/DeleteConfirmModal';
 import { Scenario } from '@/src/types/scenario';
 
 export default function ScenariosPage() {
+  const router = useRouter();
   const { scenarios, duplicateScenario } = useScenarioStore();
   const { 
     openCreateScenarioModal, 
@@ -20,10 +23,18 @@ export default function ScenariosPage() {
     sortOrder,
     toggleSortOrder,
   } = useUIStore();
+  const { profile, isSetupComplete } = useProfileStore();
   
   const [searchTerm, setSearchTerm] = useState('');
   const [renameId, setRenameId] = useState<string | null>(null);
   const [newName, setNewName] = useState('');
+
+  // Redirect to profile setup if not complete
+  React.useEffect(() => {
+    if (!profile || !isSetupComplete) {
+      router.push('/profile/setup');
+    }
+  }, [profile, isSetupComplete, router]);
 
   const scenarioList = Object.values(scenarios);
 
@@ -78,6 +89,15 @@ export default function ScenariosPage() {
       duplicateScenario(id, duplicateName);
     }
   };
+
+  // Show loading while checking profile
+  if (!profile || !isSetupComplete) {
+    return (
+      <div className="flex items-center justify-center min-h-[60vh]">
+        <span className="loading loading-spinner loading-lg"></span>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-6">

@@ -1,16 +1,5 @@
-export interface Profile {
-  id: string;
-  household: {
-    name: string;
-    originCountry: string;
-    members: Array<{
-      id: string;
-      name: string;
-      role: 'Adult' | 'Child' | 'Parent' | 'Grandparent';
-      ageGroup?: 'Baby' | 'Primary' | 'Secondary' | 'College' | 'Adult' | 'Senior';
-    }>;
-  };
-}
+// Re-export Profile from profile.ts
+export type { Profile } from './profile';
 
 export interface IncomeData {
   // To be implemented in Task 9

@@ -3,7 +3,7 @@
 import React from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { TempProfileSetup } from '@/src/components/TempProfileSetup';
+import { useProfileStore } from '@/src/store/slices/profileSlice';
 
 export default function AuthenticatedLayout({
   children,
@@ -11,10 +11,9 @@ export default function AuthenticatedLayout({
   children: React.ReactNode;
 }) {
   const pathname = usePathname();
+  const { profile, isSetupComplete } = useProfileStore();
 
   return (
-    <>
-      <TempProfileSetup />
     <div className="min-h-screen bg-base-100">
       {/* Header */}
       <header className="navbar bg-base-200 shadow-lg">
@@ -37,9 +36,12 @@ export default function AuthenticatedLayout({
               <li>
                 <Link 
                   href="/profile" 
-                  className={pathname === '/profile' ? 'active' : ''}
+                  className={`${pathname === '/profile' ? 'active' : ''} indicator`}
                 >
                   Profile
+                  {(!profile || !isSetupComplete) && (
+                    <span className="indicator-item badge badge-warning badge-xs"></span>
+                  )}
                 </Link>
               </li>
             </ul>
@@ -59,6 +61,5 @@ export default function AuthenticatedLayout({
         </div>
       </footer>
     </div>
-    </>
   );
 }
