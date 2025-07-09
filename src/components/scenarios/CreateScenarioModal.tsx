@@ -8,6 +8,7 @@ import { useScenarioStore } from '@/src/store/slices/scenarioSlice';
 import { useProfileStore } from '@/src/store/slices/profileSlice';
 import { useUIStore } from '@/src/store/slices/uiSlice';
 import { Scenario } from '@/src/types/scenario';
+import { getCountryCurrencies, getCurrencyFlag } from '@/src/utils/currency';
 
 const createScenarioSchema = z.object({
   destinationCountry: z.string().min(1, 'Destination country is required'),
@@ -188,14 +189,29 @@ export function CreateScenarioModal() {
             </label>
           </div>
 
-          {/* Origin Country Note */}
+          {/* Origin Country & Currency Info */}
           <div className="alert alert-info">
             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" className="stroke-current shrink-0 w-6 h-6">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
             </svg>
-            <span className="text-sm">
-              Origin country: <strong>{profile?.household.originCountry || 'Not set'}</strong>
-            </span>
+            <div className="text-sm">
+              <p>Origin: <strong>{profile?.household.originCountry || 'Not set'}</strong> 
+                {profile?.household.originCountry && (
+                  <span className="ml-2">
+                    {getCurrencyFlag(getCountryCurrencies(profile.household.originCountry)[0])} 
+                    {getCountryCurrencies(profile.household.originCountry)[0]}
+                  </span>
+                )}
+              </p>
+              {watchedCountry && (
+                <p>Destination Currency: 
+                  <span className="ml-2 font-medium">
+                    {getCurrencyFlag(getCountryCurrencies(watchedCountry)[0])} 
+                    {getCountryCurrencies(watchedCountry)[0]}
+                  </span>
+                </p>
+              )}
+            </div>
           </div>
 
           {/* Action Buttons */}

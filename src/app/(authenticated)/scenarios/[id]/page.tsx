@@ -1,15 +1,30 @@
 'use client';
 
-import React from 'react';
+import React, { useState } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import { useScenarioStore } from '@/src/store/slices/scenarioSlice';
+import { useProfileStore } from '@/src/store/slices/profileSlice';
+import { useFXStore } from '@/src/store/slices/fxSlice';
+import { FXRateDisplay } from '@/src/components/fx/FXRateDisplay';
+import { RateOverrideModal } from '@/src/components/fx/RateOverrideModal';
+import { getCountryCurrencies } from '@/src/utils/currency';
 
 export default function ScenarioDetailPage() {
   const params = useParams();
   const router = useRouter();
   const { getScenario } = useScenarioStore();
+  const { profile } = useProfileStore();
+  const [isRateOverrideModalOpen, setIsRateOverrideModalOpen] = useState(false);
   
   const scenario = params.id ? getScenario(params.id as string) : null;
+  
+  // Get currencies for origin and destination countries
+  const originCurrency = profile?.household.originCountry 
+    ? getCountryCurrencies(profile.household.originCountry)[0] 
+    : 'USD';
+  const destinationCurrency = scenario?.destinationCountry 
+    ? getCountryCurrencies(scenario.destinationCountry)[0] 
+    : 'EUR';
 
   if (!scenario) {
     return (
@@ -37,7 +52,7 @@ export default function ScenarioDetailPage() {
         </button>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         <div className="card bg-base-100 shadow-xl">
           <div className="card-body">
             <h2 className="card-title">Scenario Details</h2>
@@ -74,6 +89,27 @@ export default function ScenarioDetailPage() {
             </div>
           </div>
         </div>
+
+        {/* Currency Exchange Rate Card */}
+        <div className="card bg-base-100 shadow-xl">
+          <div className="card-body">
+            <div className="flex justify-between items-center mb-2">
+              <h2 className="card-title">Currency Exchange</h2>
+              <button
+                className="btn btn-ghost btn-xs"
+                onClick={() => setIsRateOverrideModalOpen(true)}
+              >
+                Override
+              </button>
+            </div>
+            <FXRateDisplay
+              from={originCurrency}
+              to={destinationCurrency}
+              showRefresh={true}
+              compact={false}
+            />
+          </div>
+        </div>
       </div>
 
       <div className="mt-8">
@@ -86,6 +122,14 @@ export default function ScenarioDetailPage() {
           </span>
         </div>
       </div>
+
+      {/* Rate Override Modal */}
+      <RateOverrideModal
+        isOpen={isRateOverrideModalOpen}
+        onClose={() => setIsRateOverrideModalOpen(false)}
+        defaultFrom={originCurrency}
+        defaultTo={destinationCurrency}
+      />
     </div>
   );
 }
